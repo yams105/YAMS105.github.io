@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
+    <title>尚湖初中 食品订单管理</title>
+    <style>
+        /* ===== 全局重置 & 基础 ===== */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
+            background: #f0f4f8;
+            padding: 12px;
+            color: #1e293b;
+            -webkit-text-size-adjust: 100%;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            padding: 16px 16px 24px;
+        }
+
+        /* ===== 头部 ===== */
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+        }
+        .header h1 {
+            font-size: clamp(18px, 5vw, 26px);
+            font-weight: 700;
+            color: #0f172a;
+            letter-spacing: 0.5px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 4px 6px;
+            line-height: 1.3;
+        }
+        .header h1 .editable-span {
+            cursor: pointer;
+            padding: 0 4px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            border-bottom: 2px solid transparent;
+            font-weight: 700;
+        }
+        .header h1 .editable-span:hover {
+            background: #eef2f6;
+            border-bottom-color: #2563eb;
+        }
+        .header h1 .editable-span:active {
+            background: #dbeafe;
+        }
+        .header h1 small {
+            font-size: clamp(14px, 3.5vw, 18px);
+            font-weight: 400;
+            color: #475569;
+            margin-left: 2px;
+            display: inline-flex;
+            align-items: center;
+        }
+        .header-info {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px 16px;
+            font-size: clamp(12px, 2.8vw, 15px);
+            color: #334155;
+            background: #f8fafc;
+            padding: 6px 14px;
+            border-radius: 40px;
+            border: 1px solid #e2e8f0;
+            width: 100%;
+            justify-content: center;
+        }
+        .header-info span {
+            white-space: nowrap;
+        }
+        .header-info strong {
+            color: #0f172a;
+        }
+
+        /* ===== 工具栏 ===== */
+        .toolbar {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 12px 16px;
+            margin-bottom: 16px;
+            background: #f8fafc;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 1px solid #e2e8f0;
+        }
+        .toolbar .ratio-group {
+            display: flex;
+            align-items: center;
+            gap: 6px 10px;
+            flex-wrap: wrap;
+            flex: 1 1 auto;
+        }
+        .toolbar .ratio-group label {
+            font-weight: 600;
+            font-size: clamp(13px, 2.8vw, 15px);
+            color: #1e293b;
+        }
+        .toolbar .ratio-group input {
+            width: 50px;
+            padding: 4px 4px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: clamp(14px, 3vw, 16px);
+            text-align: center;
+            font-weight: 600;
+            background: #ffffff;
+            transition: border-color 0.2s;
+            min-height: 36px;
+        }
+        .toolbar .ratio-group input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .toolbar .ratio-group .ratio-colon {
+            font-weight: 700;
+            font-size: clamp(16px, 3.5vw, 20px);
+            color: #475569;
+        }
+        .toolbar .ratio-group .ratio-hint {
+            font-weight: 500;
+            color: #475569;
+            font-size: clamp(11px, 2.4vw, 14px);
+            margin-left: 2px;
+        }
+        .toolbar .btn-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-left: auto;
+        }
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 40px;
+            font-size: clamp(12px, 2.6vw, 14px);
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            background: #e2e8f0;
+            color: #1e293b;
+            touch-action: manipulation;
+            min-height: 40px;
+            justify-content: center;
+            white-space: nowrap;
+        }
+        .btn:active {
+            transform: scale(0.96);
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: #fff;
+        }
+        .btn-primary:active {
+            background: #1d4ed8;
+        }
+        .btn-success {
+            background: #16a34a;
+            color: #fff;
+        }
+        .btn-success:active {
+            background: #15803d;
+        }
+        .btn-danger {
+            background: #dc2626;
+            color: #fff;
+        }
+        .btn-danger:active {
+            background: #b91c1c;
+        }
+        .btn-outline {
+            background: transparent;
+            border: 1.5px solid #cbd5e1;
+        }
+        .btn-outline:active {
+            background: #f1f5f9;
+        }
+        .btn-ghost-danger {
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-size: clamp(12px, 2.4vw, 13px);
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            min-height: 32px;
+        }
+        .btn-ghost-danger:active {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+        .btn-warning {
+            background: #f59e0b;
+            color: #fff;
+        }
+        .btn-warning:active {
+            background: #d97706;
+        }
+        .btn-sm {
+            padding: 4px 10px;
+            font-size: clamp(11px, 2.2vw, 13px);
+            min-height: 30px;
+        }
+
+        /* ===== 示例数据区域 ===== */
+        .sample-section {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 12px 14px;
+            margin-bottom: 20px;
+        }
+        .sample-section .sample-title {
+            font-size: clamp(14px, 3vw, 16px);
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .sample-section .sample-title .badge {
+            background: #e2e8f0;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-size: clamp(10px, 2vw, 12px);
+            color: #475569;
+        }
+        .sample-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            max-height: 360px;
+            overflow-y: auto;
+        }
+        .sample-table {
+            width: 100%;
+            min-width: 420px;
+            border-collapse: collapse;
+            font-size: clamp(11px, 2.4vw, 13px);
+            background: #ffffff;
+            border-radius: 8px;
+        }
+        .sample-table th {
+            background: #e9edf4;
+            padding: 5px 6px;
+            border: 1px solid #d1d9e6;
+            text-align: center;
+            font-weight: 600;
+            color: #1e293b;
+            white-space: nowrap;
+        }
+        .sample-table td {
+            padding: 4px 6px;
+            border: 1px solid #d1d9e6;
+            text-align: center;
+            word-break: break-word;
+        }
+
+        /* ===== 智能体表格区域 ===== */
+        .agent-header {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 8px;
+        }
+        .agent-header h2 {
+            font-size: clamp(16px, 4vw, 20px);
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .agent-header .save-hint {
+            font-size: clamp(11px, 2.4vw, 14px);
+            color: #64748b;
+        }
+
+        .day-block {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 16px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+        }
+        .day-block:last-child {
+            margin-bottom: 0;
+        }
+        .day-header {
+            background: #f1f5f9;
+            padding: 10px 14px;
+            font-size: clamp(15px, 3.8vw, 18px);
+            font-weight: 700;
+            color: #0f172a;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            cursor: default;
+        }
+        .day-header .day-name {
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: background 0.2s;
+            flex: 1 1 auto;
+        }
+        .day-header .day-name:hover {
+            background: #e2e8f0;
+        }
+        .day-header .day-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+        .day-header .day-actions .btn {
+            padding: 4px 12px;
+            font-size: clamp(11px, 2.2vw, 13px);
+            min-height: 32px;
+        }
+
+        .items-table-wrap {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding: 0 2px 2px 2px;
+        }
+        .items-table {
+            width: 100%;
+            min-width: 480px;
+            border-collapse: collapse;
+            font-size: clamp(12px, 2.6vw, 14px);
+        }
+        .items-table th {
+            background: #f1f5f9;
+            text-align: center;
+            padding: 6px 4px;
+            font-weight: 600;
+            color: #334155;
+            border-bottom: 2px solid #d1d9e6;
+            font-size: clamp(11px, 2.2vw, 13px);
+            white-space: nowrap;
+        }
+        .items-table td {
+            padding: 4px 4px;
+            border-bottom: 1px solid #eef2f6;
+            vertical-align: middle;
+            text-align: center;
+        }
+        .items-table tr:last-child td {
+            border-bottom: none;
+        }
+        .items-table .col-name {
+            min-width: 70px;
+            text-align: left;
+            font-weight: 500;
+        }
+        .items-table .col-name input {
+            width: 100%;
+            min-width: 50px;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 3px 4px;
+            border-radius: 4px;
+            font-size: clamp(12px, 2.6vw, 14px);
+            font-weight: 500;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .items-table .col-name input:hover {
+            background: #f8fafc;
+        }
+        .items-table .col-name input:focus {
+            border-color: #2563eb;
+            background: #ffffff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+        }
+        .items-table .col-num input {
+            width: 60px;
+            max-width: 100%;
+            text-align: center;
+            padding: 3px 2px;
+            border: 1.5px solid #e2e8f0;
+            border-radius: 6px;
+            font-size: clamp(12px, 2.6vw, 14px);
+            font-weight: 500;
+            background: #ffffff;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .items-table .col-num input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+        }
+        .items-table .col-num .auto-value {
+            display: inline-block;
+            min-width: 36px;
+            padding: 3px 2px;
+            font-weight: 600;
+            color: #0f172a;
+            background: #f8fafc;
+            border-radius: 4px;
+            font-size: clamp(12px, 2.6vw, 14px);
+        }
+        .items-table .col-note input {
+            width: 100%;
+            min-width: 50px;
+            border: 1px solid transparent;
+            background: transparent;
+            padding: 3px 4px;
+            border-radius: 4px;
+            font-size: clamp(11px, 2.4vw, 13px);
+            color: #475569;
+            transition: border-color 0.2s, background 0.2s;
+        }
+        .items-table .col-note input:hover {
+            background: #f8fafc;
+        }
+        .items-table .col-note input:focus {
+            border-color: #2563eb;
+            background: #ffffff;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.10);
+        }
+        .items-table .col-action {
+            width: 36px;
+            text-align: center;
+        }
+        .items-table .col-action .btn {
+            padding: 2px 6px;
+            font-size: clamp(11px, 2.2vw, 13px);
+            border-radius: 30px;
+            background: transparent;
+            color: #94a3b8;
+            border: 1px solid transparent;
+            min-height: 28px;
+        }
+        .items-table .col-action .btn:active {
+            background: #fee2e2;
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+        .items-table .col-idx {
+            width: 28px;
+            text-align: center;
+            font-size: clamp(11px, 2.2vw, 13px);
+            color: #94a3b8;
+            font-weight: 500;
+        }
+        .items-table .empty-row td {
+            padding: 16px 10px;
+            color: #94a3b8;
+            font-style: italic;
+            text-align: center;
+        }
+
+        .add-row-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 14px;
+            margin: 4px 0 8px 10px;
+            border: 1.5px dashed #cbd5e1;
+            border-radius: 30px;
+            background: transparent;
+            font-size: clamp(11px, 2.4vw, 13px);
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            touch-action: manipulation;
+            min-height: 34px;
+        }
+        .add-row-btn:active {
+            border-color: #2563eb;
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        /* ===== 草稿箱样式 ===== */
+        .draft-section {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid #e2e8f0;
+        }
+        .draft-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .draft-header h3 {
+            font-size: clamp(16px, 3.5vw, 18px);
+            font-weight: 600;
+            color: #0f172a;
+            margin-right: 8px;
+        }
+        .draft-header .draft-input-group {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            align-items: center;
+            flex: 1 1 auto;
+        }
+        .draft-header .draft-input-group input {
+            padding: 6px 10px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: clamp(13px, 2.6vw, 14px);
+            min-width: 120px;
+            flex: 1 1 150px;
+            min-height: 36px;
+        }
+        .draft-header .draft-input-group input:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .draft-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 4px 0;
+        }
+        .draft-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 6px 12px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 6px 10px;
+            font-size: clamp(12px, 2.4vw, 14px);
+            width: 100%;
+        }
+        .draft-item .draft-info {
+            flex: 1 1 150px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px 12px;
+        }
+        .draft-item .draft-info .draft-name {
+            font-weight: 600;
+            color: #0f172a;
+        }
+        .draft-item .draft-info .draft-time {
+            color: #64748b;
+            font-size: clamp(11px, 2.2vw, 13px);
+        }
+        .draft-item .draft-actions {
+            display: flex;
+            gap: 4px;
+            flex-wrap: wrap;
+        }
+        .draft-item .draft-actions .btn {
+            padding: 2px 10px;
+            font-size: clamp(11px, 2.2vw, 13px);
+            min-height: 28px;
+        }
+        .empty-drafts {
+            color: #94a3b8;
+            font-style: italic;
+            padding: 8px 0;
+        }
+        .auto-save-badge {
+            background: #dbeafe;
+            color: #1d4ed8;
+            border-radius: 30px;
+            padding: 0 10px;
+            font-size: clamp(10px, 2vw, 12px);
+            font-weight: 500;
+        }
+
+        /* ===== 底部按钮 ===== */
+        .footer-actions {
+            margin-top: 20px;
+            padding-top: 16px;
+            border-top: 2px solid #e2e8f0;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        .footer-actions .btn {
+            padding: 10px 20px;
+            font-size: clamp(13px, 3vw, 15px);
+            min-height: 44px;
+            flex: 1 1 auto;
+            max-width: 100%;
+        }
+
+        .empty-state {
+            padding: 30px 16px;
+            text-align: center;
+            color: #94a3b8;
+            font-size: clamp(14px, 3vw, 16px);
+            border: 2px dashed #e2e8f0;
+            border-radius: 14px;
+            margin-bottom: 16px;
+        }
+        .empty-state .btn {
+            margin-top: 10px;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(80px);
+            background: #0f172a;
+            color: #f8fafc;
+            padding: 10px 22px;
+            border-radius: 40px;
+            font-size: clamp(13px, 2.8vw, 15px);
+            font-weight: 500;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+            opacity: 0;
+            transition: all 0.4s ease;
+            z-index: 999;
+            pointer-events: none;
+            max-width: 90vw;
+            text-align: center;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success {
+            background: #16a34a;
+        }
+        .toast.error {
+            background: #dc2626;
+        }
+        .toast.warning {
+            background: #f59e0b;
+        }
+
+        .ratio-badge {
+            display: inline-block;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 2px 12px;
+            border-radius: 30px;
+            font-weight: 600;
+            font-size: clamp(12px, 2.6vw, 14px);
+            margin-left: 2px;
+        }
+
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+        }
+        .modal-overlay.active {
+            display: flex;
+        }
+        .modal-box {
+            background: #ffffff;
+            padding: 24px 20px;
+            border-radius: 16px;
+            max-width: 420px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        .modal-box h3 {
+            margin-bottom: 14px;
+            font-size: clamp(18px, 4.5vw, 22px);
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .modal-box .field-group {
+            margin-bottom: 12px;
+        }
+        .modal-box .field-group label {
+            display: block;
+            font-weight: 600;
+            font-size: clamp(13px, 2.8vw, 15px);
+            color: #334155;
+            margin-bottom: 4px;
+        }
+        .modal-box .field-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: clamp(14px, 3vw, 16px);
+            background: #fff;
+            transition: border-color 0.2s;
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        .modal-box .field-group select:focus {
+            border-color: #2563eb;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+        }
+        .modal-box .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 16px;
+        }
+        .modal-box .modal-actions .btn {
+            min-height: 40px;
+            padding: 8px 20px;
+            flex: 1 1 auto;
+        }
+
+        /* 响应式 */
+        @media (max-width: 768px) {
+            body { padding: 8px; }
+            .app-container { padding: 12px; }
+            .header { flex-direction: column; align-items: stretch; gap: 8px; }
+            .header h1 { justify-content: center; text-align: center; }
+            .header-info { width: 100%; justify-content: center; font-size: clamp(11px, 2.6vw, 13px); padding: 4px 10px; gap: 4px 12px; flex-wrap: wrap; }
+            .toolbar { flex-direction: column; align-items: stretch; gap: 10px; padding: 12px; }
+            .toolbar .ratio-group { justify-content: center; }
+            .toolbar .btn-group { margin-left: 0; justify-content: center; flex-wrap: wrap; }
+            .btn { padding: 6px 14px; font-size: clamp(11px, 2.6vw, 13px); min-height: 36px; }
+            .day-header { padding: 8px 12px; font-size: clamp(14px, 3.5vw, 16px); }
+            .items-table { min-width: 400px; font-size: clamp(11px, 2.4vw, 13px); }
+            .items-table th { font-size: clamp(10px, 2.2vw, 12px); padding: 4px 3px; }
+            .items-table td { padding: 3px 3px; }
+            .items-table .col-num input { width: 48px; font-size: clamp(11px, 2.4vw, 13px); padding: 2px 2px; }
+            .items-table .col-num .auto-value { font-size: clamp(11px, 2.4vw, 13px); min-width: 30px; }
+            .items-table .col-name input { font-size: clamp(11px, 2.4vw, 13px); padding: 2px 3px; }
+            .items-table .col-note input { font-size: clamp(10px, 2.2vw, 12px); padding: 2px 3px; }
+            .items-table .col-idx { font-size: clamp(10px, 2.2vw, 12px); width: 24px; }
+            .items-table .col-action { width: 30px; }
+            .items-table .col-action .btn { font-size: clamp(10px, 2.2vw, 12px); min-height: 24px; padding: 1px 4px; }
+            .add-row-btn { font-size: clamp(10px, 2.2vw, 12px); padding: 3px 12px; min-height: 30px; margin: 2px 0 6px 8px; }
+            .footer-actions { flex-direction: column; gap: 8px; }
+            .footer-actions .btn { width: 100%; justify-content: center; padding: 10px 16px; font-size: clamp(13px, 3vw, 15px); min-height: 44px; }
+            .sample-table { min-width: 340px; font-size: clamp(10px, 2.2vw, 12px); }
+            .sample-table th, .sample-table td { padding: 3px 4px; }
+            .modal-box { padding: 18px 16px; margin: 8px; }
+            .modal-box .field-group select { font-size: clamp(14px, 3.2vw, 16px); padding: 6px 10px; padding-right: 32px; }
+            .modal-box .modal-actions .btn { min-height: 38px; padding: 6px 16px; }
+            .agent-header h2 { font-size: clamp(15px, 3.8vw, 18px); }
+            .agent-header .save-hint { font-size: clamp(10px, 2.2vw, 12px); }
+            .draft-header .draft-input-group input { min-width: 80px; }
+            .draft-item { flex-direction: column; align-items: stretch; }
+            .draft-item .draft-actions { justify-content: flex-end; }
+        }
+        @media (max-width: 480px) {
+            body { padding: 4px; }
+            .app-container { padding: 8px; }
+            .header h1 { font-size: clamp(16px, 4.5vw, 20px); }
+            .header h1 small { font-size: clamp(12px, 3vw, 15px); }
+            .header-info { font-size: clamp(10px, 2.4vw, 12px); padding: 4px 8px; gap: 2px 10px; border-radius: 30px; }
+            .toolbar { padding: 8px 10px; gap: 8px; }
+            .toolbar .ratio-group input { width: 42px; font-size: clamp(13px, 3vw, 15px); min-height: 32px; padding: 2px 2px; }
+            .btn { padding: 5px 12px; font-size: clamp(10px, 2.4vw, 12px); min-height: 32px; }
+            .day-header { padding: 6px 10px; font-size: clamp(13px, 3.2vw, 15px); }
+            .items-table { min-width: 320px; font-size: clamp(10px, 2.2vw, 12px); }
+            .items-table th { font-size: clamp(9px, 2vw, 11px); padding: 3px 2px; }
+            .items-table td { padding: 2px 2px; }
+            .items-table .col-num input { width: 40px; font-size: clamp(10px, 2.2vw, 12px); padding: 1px 2px; }
+            .items-table .col-num .auto-value { font-size: clamp(10px, 2.2vw, 12px); min-width: 26px; padding: 1px 2px; }
+            .items-table .col-name input { font-size: clamp(10px, 2.2vw, 12px); padding: 1px 2px; min-width: 40px; }
+            .items-table .col-note input { font-size: clamp(9px, 2vw, 11px); padding: 1px 2px; min-width: 40px; }
+            .items-table .col-idx { font-size: clamp(9px, 2vw, 11px); width: 20px; }
+            .items-table .col-action { width: 26px; }
+            .items-table .col-action .btn { font-size: clamp(9px, 2vw, 11px); min-height: 20px; padding: 0px 3px; }
+            .add-row-btn { font-size: clamp(9px, 2vw, 11px); padding: 2px 10px; min-height: 26px; margin: 2px 0 4px 6px; }
+            .sample-table { min-width: 280px; font-size: clamp(9px, 2vw, 11px); }
+            .sample-table th, .sample-table td { padding: 2px 3px; }
+            .modal-box { padding: 14px 12px; }
+            .modal-box h3 { font-size: clamp(16px, 4vw, 19px); }
+            .modal-box .field-group label { font-size: clamp(12px, 2.8vw, 14px); }
+            .modal-box .field-group select { font-size: clamp(13px, 3vw, 15px); padding: 5px 8px; padding-right: 28px; }
+            .footer-actions .btn { padding: 8px 12px; font-size: clamp(12px, 2.8vw, 14px); min-height: 38px; }
+            .toast { font-size: clamp(11px, 2.6vw, 13px); padding: 8px 16px; bottom: 12px; max-width: 95vw; }
+            .ratio-badge { font-size: clamp(10px, 2.4vw, 12px); padding: 1px 10px; }
+            .toolbar .ratio-group .ratio-hint { font-size: clamp(9px, 2vw, 11px); }
+            .agent-header h2 { font-size: clamp(14px, 3.6vw, 17px); }
+            .agent-header .save-hint { font-size: clamp(9px, 2vw, 11px); }
+            .empty-state { padding: 20px 12px; font-size: clamp(13px, 3vw, 15px); }
+            .draft-header .draft-input-group input { min-width: 60px; }
+            .draft-item { padding: 4px 8px; }
+        }
+        @media (min-width: 1200px) {
+            .app-container { padding: 32px 36px 44px; }
+            .header-info { padding: 10px 24px; }
+            .toolbar { padding: 16px 24px; }
+            .items-table { font-size: 15px; }
+            .items-table th { font-size: 14px; padding: 10px 10px; }
+            .items-table td { padding: 8px 10px; }
+            .items-table .col-num input { width: 80px; font-size: 15px; }
+            .day-header { padding: 14px 24px; font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container" id="app">
+        <!-- 头部 -->
+        <div class="header">
+            <h1 id="mainTitle">
+                尚湖初中
+                <span id="weekDisplay" class="editable-span" title="双击编辑周数">第2周</span>
+                食品订单
+                <small><span id="dateDisplay" class="editable-span" title="双击编辑日期范围">9月7日 — 9月11日</span></small>
+            </h1>
+            <div class="header-info">
+                <span>🏫 <strong id="schoolDisplay">尚湖初中</strong></span>
+                <span>👤 经办人：<strong id="contactDisplay">王亚俐</strong></span>
+                <span>📞 <strong id="phoneDisplay">528939</strong></span>
+                <span>⚖️ 单位：<strong id="unitDisplay">斤</strong></span>
+            </div>
+        </div>
+
+        <!-- 工具栏 -->
+        <div class="toolbar">
+            <div class="ratio-group">
+                <label>📊 分配比例</label>
+                <span>学生</span>
+                <input type="number" id="ratioStudent" value="7" min="1" step="1">
+                <span class="ratio-colon">:</span>
+                <span>教师</span>
+                <input type="number" id="ratioTeacher" value="1" min="1" step="1">
+                <span class="ratio-hint">（合计自动分配）</span>
+                <span class="ratio-badge" id="ratioBadge">7 : 1</span>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" id="exportBtn">📥 导出 .xlsx</button>
+                <button class="btn btn-danger" id="clearBtn">🗑️ 清空数据</button>
+            </div>
+        </div>
+
+        <!-- 示例数据区域（只读） -->
+        <div class="sample-section" id="sampleSection">
+            <div class="sample-title">
+                📋 示例数据（仅供参考，不参与智能体运算）
+                <span class="badge">只读</span>
+            </div>
+            <div class="sample-table-wrap" id="sampleTableWrap">
+                <!-- 由 JavaScript 动态渲染 -->
+            </div>
+        </div>
+
+        <!-- 智能体表格区域 -->
+        <div style="margin-top: 16px; border-top: 2px dashed #d1d9e6; padding-top: 16px;">
+            <div class="agent-header">
+                <h2>🧠 智能体表格 (可编辑)</h2>
+                <span class="save-hint">💾 数据自动保存</span>
+            </div>
+            <div id="daysContainer"></div>
+        </div>
+
+        <!-- 草稿箱区域 -->
+        <div class="draft-section" id="draftSection">
+            <div class="draft-header">
+                <h3>📦 草稿箱</h3>
+                <div class="draft-input-group">
+                    <input type="text" id="draftNameInput" placeholder="草稿名称（可选）" value="">
+                    <button class="btn btn-primary" id="saveDraftBtn">💾 保存到草稿箱</button>
+                    <span style="font-size:clamp(11px,2.2vw,13px);color:#64748b;">自动保存中...</span>
+                </div>
+            </div>
+            <div id="draftListContainer" class="draft-list">
+                <!-- 由 JavaScript 渲染 -->
+            </div>
+        </div>
+
+        <!-- 底部 -->
+        <div class="footer-actions">
+            <button class="btn btn-primary" id="addDayBtn">➕ 添加新的一天</button>
+            <button class="btn btn-success" id="exportBtn2">📥 导出 .xlsx</button>
+            <button class="btn btn-danger" id="clearBtn2">🗑️ 清空数据</button>
+        </div>
+    </div>
+
+    <!-- 模态框 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <h3 id="modalTitle">添加新的一天</h3>
+            <div id="modalBody"></div>
+            <div class="modal-actions">
+                <button class="btn btn-outline" id="modalCancel">取消</button>
+                <button class="btn btn-primary" id="modalConfirm">确认</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast"></div>
+
+    <script>
+        // ================================================================
+        // 1. 示例数据（只读展示，扁平化：无餐次）
+        // ================================================================
+        const SAMPLE_DATA = {
+            school: '尚湖初中',
+            contact: '王亚俐',
+            phone: '528939',
+            unit: '斤',
+            week: '第2周',
+            dateRange: '9月7日 — 9月11日',
+            days: [{
+                name: '周一',
+                items: [
+                    { name: '前腿肉', total: 150, note: '' },
+                    { name: '油泡', total: 30, note: '' },
+                    { name: '三层腊肉', total: 15, note: '' },
+                    { name: '球菜', total: 125, note: '' },
+                    { name: '丝瓜', total: 20, note: '' },
+                    { name: '西红柿', total: 25, note: '' },
+                    { name: '青菜', total: 60, note: '' },
+                    { name: '鸡蛋', total: 20, note: '' },
+                    { name: '年糕', total: 130, note: '' },
+                    { name: '豆腐', total: 25, note: '' },
+                    { name: '烧麦', total: 410, note: '个' },
+                    { name: '蚝油', total: 12, note: '' },
+                    { name: '面粉', total: 100, note: '' },
+                    { name: '大米', total: 1000, note: '' },
+                    { name: '油', total: 16, note: '' },
+                    { name: '料酒', total: 40, note: '' },
+                    { name: '香醋', total: 12, note: '' },
+                    { name: '老抽', total: 6, note: '' },
+                    { name: '盐', total: 60, note: '' },
+                    { name: '美味鲜', total: 6, note: '' },
+                    { name: '小葱', total: 2, note: '' },
+                    { name: '生姜', total: 1, note: '' },
+                    { name: '大蒜', total: 1, note: '' },
+                    { name: '乌江榨菜', total: 1, note: '箱' }
+                ]
+            }, {
+                name: '周二',
+                items: [
+                    { name: '梅干菜', total: 11, note: '' },
+                    { name: '前腿肉', total: 196, note: '' },
+                    { name: '脆山药', total: 56, note: '' },
+                    { name: '干木耳', total: 3, note: '' },
+                    { name: '紫菜', total: 1, note: '' },
+                    { name: '鸡蛋', total: 21, note: '' },
+                    { name: '整只鸭', total: 100, note: '' },
+                    { name: '藕', total: 110, note: '' },
+                    { name: '金针菇', total: 16, note: '' },
+                    { name: '豆腐', total: 15, note: '' },
+                    { name: '黑糯米糕', total: 880, note: '个' },
+                    { name: '馄饨皮', total: 50, note: '今早吃' },
+                    { name: '大黄豆', total: 18, note: '' },
+                    { name: '小葱', total: 1, note: '' },
+                    { name: '生姜', total: 1, note: '' },
+                    { name: '大蒜', total: 1, note: '' }
+                ]
+            }, {
+                name: '周三',
+                items: [
+                    { name: '前腿肉', total: 117, note: '' },
+                    { name: '胡萝卜', total: 28, note: '' },
+                    { name: '青圆椒', total: 21, note: '' },
+                    { name: '洋葱', total: 7, note: '' },
+                    { name: '玉米粒', total: 112, note: '' },
+                    { name: '青豆', total: 35, note: '' },
+                    { name: '西红柿', total: 28, note: '' },
+                    { name: '鸡蛋', total: 91, note: '' },
+                    { name: '球菜', total: 60, note: '' },
+                    { name: '粉干', total: 70, note: '' },
+                    { name: '冬瓜', total: 24, note: '' },
+                    { name: '虾皮', total: 1, note: '' },
+                    { name: '豆腐', total: 40, note: '' },
+                    { name: '咸菜', total: 50, note: '' },
+                    { name: '玉米粉', total: 30, note: '' },
+                    { name: '小葱', total: 1, note: '' },
+                    { name: '生姜', total: 1, note: '' },
+                    { name: '大蒜', total: 1, note: '' }
+                ]
+            }, {
+                name: '周四',
+                items: [
+                    { name: '大排', total: 700, note: '片' },
+                    { name: '球菜', total: 112, note: '' },
+                    { name: '干番薯粉丝', total: 21, note: '' },
+                    { name: '平菇', total: 20, note: '' },
+                    { name: '豆腐', total: 73, note: '' },
+                    { name: '中翅', total: 1220, note: '只' },
+                    { name: '青菜', total: 90, note: '' },
+                    { name: '榨菜', total: 50, note: '' },
+                    { name: '鸡蛋', total: 12, note: '' },
+                    { name: '粽子', total: 406, note: '今早吃' },
+                    { name: '前腿肉', total: 25, note: '' },
+                    { name: '韭菜', total: 3, note: '' },
+                    { name: '老南瓜', total: 50, note: '' },
+                    { name: '小葱', total: 1, note: '' },
+                    { name: '生姜', total: 1, note: '' },
+                    { name: '大蒜', total: 1, note: '' }
+                ]
+            }, {
+                name: '周五',
+                items: [
+                    { name: '明虾', total: 130, note: '' },
+                    { name: '香菇', total: 24, note: '' },
+                    { name: '青菜', total: 120, note: '' },
+                    { name: '金针菇', total: 20, note: '' },
+                    { name: '豆腐', total: 28, note: '' }
+                ]
+            }]
+        };
+
+        // ================================================================
+        // 2. 智能体数据管理
+        // ================================================================
+        const STORAGE_KEY = 'foodOrderData_v21';
+        const DRAFTS_KEY = 'foodOrderDrafts_v1';
+
+        let appData = null;
+        let saveTimeout = null;
+        let drafts = [];
+        let autoSaveInterval = null;
+
+        function loadAppData() {
+            const stored = localStorage.getItem(STORAGE_KEY);
+            if (stored) {
+                try {
+                    const parsed = JSON.parse(stored);
+                    const defaultMeta = {
+                        school: '尚湖初中',
+                        contact: '王亚俐',
+                        phone: '528939',
+                        unit: '斤',
+                        week: '第2周',
+                        dateRange: '9月7日 — 9月11日',
+                        ratioStudent: 7,
+                        ratioTeacher: 1,
+                        days: []
+                    };
+                    appData = mergeDeep(defaultMeta, parsed);
+                    appData.days.forEach(day => {
+                        if (!day.items) day.items = [];
+                        day.items.forEach(item => {
+                            if (item.total === undefined) item.total = 0;
+                            if (item.note === undefined) item.note = '';
+                        });
+                    });
+                    return;
+                } catch (e) {
+                    console.warn('读取存储失败，使用空数据', e);
+                }
+            }
+            appData = {
+                school: '尚湖初中',
+                contact: '王亚俐',
+                phone: '528939',
+                unit: '斤',
+                week: '第2周',
+                dateRange: '9月7日 — 9月11日',
+                ratioStudent: 7,
+                ratioTeacher: 1,
+                days: []
+            };
+        }
+
+        function saveAppData() {
+            if (!appData) return;
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => {
+                try {
+                    localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+                } catch (e) {
+                    console.warn('保存失败', e);
+                }
+            }, 150);
+        }
+
+        function cloneDeep(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        function mergeDeep(target, source) {
+            const result = cloneDeep(target);
+            for (const key in source) {
+                if (source.hasOwnProperty(key)) {
+                    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                        result[key] = mergeDeep(result[key] || {}, source[key]);
+                    } else {
+                        result[key] = source[key];
+                    }
+                }
+            }
+            return result;
+        }
+
+        // ================================================================
+        // 3. 草稿箱管理
+        // ================================================================
+        function loadDrafts() {
+            const stored = localStorage.getItem(DRAFTS_KEY);
+            if (stored) {
+                try {
+                    drafts = JSON.parse(stored);
+                    // 确保每个草稿有 id 和 data
+                    drafts = drafts.filter(d => d && d.id && d.data);
+                } catch (e) {
+                    drafts = [];
+                }
+            } else {
+                drafts = [];
+            }
+            renderDraftList();
+        }
+
+        function saveDrafts() {
+            try {
+                localStorage.setItem(DRAFTS_KEY, JSON.stringify(drafts));
+            } catch (e) {
+                console.warn('保存草稿失败', e);
+            }
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2, 6);
+        }
+
+        function formatTimestamp(ts) {
+            const d = new Date(ts);
+            return d.toLocaleString('zh-CN', { hour12: false });
+        }
+
+        function addDraft(name, data) {
+            const draft = {
+                id: generateId(),
+                name: name || '未命名草稿',
+                timestamp: Date.now(),
+                data: cloneDeep(data)
+            };
+            // 如果名称为"自动保存"，查找是否有同名草稿并覆盖
+            if (name === '自动保存') {
+                const existing = drafts.find(d => d.name === '自动保存');
+                if (existing) {
+                    existing.data = cloneDeep(data);
+                    existing.timestamp = Date.now();
+                    saveDrafts();
+                    renderDraftList();
+                    return existing;
+                }
+            }
+            drafts.push(draft);
+            saveDrafts();
+            renderDraftList();
+            return draft;
+        }
+
+        function deleteDraft(id) {
+            drafts = drafts.filter(d => d.id !== id);
+            saveDrafts();
+            renderDraftList();
+        }
+
+        function loadDraft(id) {
+            const draft = drafts.find(d => d.id === id);
+            if (!draft) {
+                showToast('草稿不存在', 'error');
+                return;
+            }
+            // 替换当前数据
+            appData = cloneDeep(draft.data);
+            // 确保结构完整
+            if (!appData.days) appData.days = [];
+            appData.days.forEach(day => {
+                if (!day.items) day.items = [];
+                day.items.forEach(item => {
+                    if (item.total === undefined) item.total = 0;
+                    if (item.note === undefined) item.note = '';
+                });
+            });
+            saveAppData();
+            renderApp();
+            showToast(`已加载草稿：${draft.name}`, 'success');
+        }
+
+        function exportDraft(id) {
+            const draft = drafts.find(d => d.id === id);
+            if (!draft) {
+                showToast('草稿不存在', 'error');
+                return;
+            }
+            // 导出该草稿数据为xlsx
+            exportXlsxData(draft.data, `草稿_${draft.name}_${formatTimestamp(draft.timestamp)}`);
+        }
+
+        function renderDraftList() {
+            const container = document.getElementById('draftListContainer');
+            if (!container) return;
+            if (drafts.length === 0) {
+                container.innerHTML = '<div class="empty-drafts">暂无草稿，保存当前数据到草稿箱吧。</div>';
+                return;
+            }
+            // 按时间降序排列
+            const sorted = [...drafts].sort((a, b) => b.timestamp - a.timestamp);
+            let html = '';
+            sorted.forEach(d => {
+                const isAuto = d.name === '自动保存';
+                html += `
+                    <div class="draft-item">
+                        <div class="draft-info">
+                            <span class="draft-name">${escapeHtml(d.name)} ${isAuto ? '<span class="auto-save-badge">自动</span>' : ''}</span>
+                            <span class="draft-time">${formatTimestamp(d.timestamp)}</span>
+                        </div>
+                        <div class="draft-actions">
+                            <button class="btn btn-primary btn-sm load-draft" data-id="${d.id}">📂 加载</button>
+                            <button class="btn btn-success btn-sm export-draft" data-id="${d.id}">📥 导出</button>
+                            <button class="btn btn-danger btn-sm delete-draft" data-id="${d.id}">🗑️</button>
+                        </div>
+                    </div>
+                `;
+            });
+            container.innerHTML = html;
+
+            // 绑定事件
+            container.querySelectorAll('.load-draft').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    loadDraft(id);
+                };
+            });
+            container.querySelectorAll('.export-draft').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    exportDraft(id);
+                };
+            });
+            container.querySelectorAll('.delete-draft').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const id = this.dataset.id;
+                    if (confirm('确定删除该草稿吗？')) {
+                        deleteDraft(id);
+                        showToast('草稿已删除', 'success');
+                    }
+                };
+            });
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        }
+
+        // ================================================================
+        // 4. 计算工具
+        // ================================================================
+        function calcStudentTeacher(total, sRatio, tRatio) {
+            if (total === undefined || total === null || isNaN(total)) return { student: 0, teacher: 0 };
+            const num = parseFloat(total);
+            if (isNaN(num) || num < 0) return { student: 0, teacher: 0 };
+            const sum = sRatio + tRatio;
+            if (sum === 0) return { student: 0, teacher: 0 };
+            const student = (num * sRatio) / sum;
+            const teacher = (num * tRatio) / sum;
+            return {
+                student: Math.round(student * 100) / 100,
+                teacher: Math.round(teacher * 100) / 100
+            };
+        }
+
+        // ================================================================
+        // 5. 渲染示例数据（只读，扁平化）
+        // ================================================================
+        function renderSampleData() {
+            const wrap = document.getElementById('sampleTableWrap');
+            if (!wrap) return;
+            const data = SAMPLE_DATA;
+            let html = '<table class="sample-table"><thead><tr>';
+            const headers = ['日期', '序号', '品名', '合计', '备注'];
+            headers.forEach(h => html += `<th>${h}</th>`);
+            html += '</tr></thead><tbody>';
+
+            data.days.forEach((day, dIdx) => {
+                const dayName = day.name || '未命名';
+                const items = day.items || [];
+                if (items.length === 0) {
+                    html += `<tr><td>${dayName}</td><td colspan="4" style="color:#94a3b8;font-style:italic;">（无菜品）</td></tr>`;
+                } else {
+                    items.forEach((item, iIdx) => {
+                        html += `<tr>`;
+                        if (iIdx === 0) {
+                            html += `<td rowspan="${items.length}">${dayName}</td>`;
+                        }
+                        html += `<td>${iIdx+1}</td>`;
+                        html += `<td style="text-align:left;">${item.name || ''}</td>`;
+                        html += `<td>${item.total ?? 0}</td>`;
+                        html += `<td>${item.note || ''}</td>`;
+                        html += '</tr>';
+                    });
+                }
+            });
+
+            html += '</tbody></table>';
+            wrap.innerHTML = html;
+        }
+
+        // ================================================================
+        // 6. 模态框管理（简化：只用于日期名称编辑）
+        // ================================================================
+        let modalResolve = null;
+
+        function showModal(options) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('modalOverlay');
+                const title = document.getElementById('modalTitle');
+                const body = document.getElementById('modalBody');
+                const confirmBtn = document.getElementById('modalConfirm');
+                const cancelBtn = document.getElementById('modalCancel');
+
+                title.textContent = options.title || '输入';
+                let html = '';
+                if (options.mode === 'day') {
+                    html += `
+                        <div class="field-group">
+                            <label>星期名称</label>
+                            <select id="modalWeekday">
+                                <option value="周一">周一</option>
+                                <option value="周二">周二</option>
+                                <option value="周三">周三</option>
+                                <option value="周四">周四</option>
+                                <option value="周五">周五</option>
+                                <option value="周六">周六</option>
+                                <option value="周日">周日</option>
+                            </select>
+                        </div>
+                    `;
+                } else {
+                    html = '<div class="field-group"><label>输入</label><input type="text" id="modalTextInput" style="width:100%;padding:8px;border:1.5px solid #cbd5e1;border-radius:8px;font-size:16px;"></div>';
+                }
+                body.innerHTML = html;
+
+                if (options.defaults) {
+                    if (options.mode === 'day') {
+                        const select = document.getElementById('modalWeekday');
+                        if (select) {
+                            for (let opt of select.options) {
+                                if (opt.value === options.defaults) { opt.selected = true; break; }
+                            }
+                        }
+                    }
+                }
+
+                overlay.classList.add('active');
+
+                const newConfirm = function() {
+                    let result = null;
+                    if (options.mode === 'day') {
+                        result = document.getElementById('modalWeekday').value;
+                    } else {
+                        const inp = document.getElementById('modalTextInput');
+                        if (inp) result = inp.value.trim();
+                    }
+                    overlay.classList.remove('active');
+                    resolve(result);
+                };
+                const newCancel = function() {
+                    overlay.classList.remove('active');
+                    resolve(null);
+                };
+                confirmBtn.onclick = newConfirm;
+                cancelBtn.onclick = newCancel;
+                overlay.onclick = function(e) {
+                    if (e.target === overlay) {
+                        newCancel();
+                    }
+                };
+                const escHandler = function(e) {
+                    if (e.key === 'Escape') {
+                        newCancel();
+                        document.removeEventListener('keydown', escHandler);
+                    }
+                };
+                document.addEventListener('keydown', escHandler);
+                modalResolve = resolve;
+            });
+        }
+
+        // ================================================================
+        // 7. 渲染智能体表格（可编辑，无餐次）
+        // ================================================================
+        function renderApp() {
+            if (!appData) return;
+            const container = document.getElementById('daysContainer');
+            container.innerHTML = '';
+
+            // 更新头部
+            document.getElementById('schoolDisplay').textContent = appData.school || '尚湖初中';
+            document.getElementById('contactDisplay').textContent = appData.contact || '王亚俐';
+            document.getElementById('phoneDisplay').textContent = appData.phone || '528939';
+            document.getElementById('unitDisplay').textContent = appData.unit || '斤';
+            const weekEl = document.getElementById('weekDisplay');
+            const dateEl = document.getElementById('dateDisplay');
+            weekEl.textContent = appData.week || '第2周';
+            dateEl.textContent = appData.dateRange || '9月7日 — 9月11日';
+
+            const sInp = document.getElementById('ratioStudent');
+            const tInp = document.getElementById('ratioTeacher');
+            sInp.value = appData.ratioStudent || 7;
+            tInp.value = appData.ratioTeacher || 1;
+            document.getElementById('ratioBadge').textContent = `${appData.ratioStudent} : ${appData.ratioTeacher}`;
+
+            const sRatio = appData.ratioStudent || 7;
+            const tRatio = appData.ratioTeacher || 1;
+
+            if (appData.days.length === 0) {
+                const emptyDiv = document.createElement('div');
+                emptyDiv.className = 'empty-state';
+                emptyDiv.innerHTML = `
+                    <p>📋 智能体表格暂无数据，请点击下方 "➕ 添加新的一天" 开始创建订单。</p>
+                    <p style="font-size:clamp(12px,2.6vw,14px);color:#94a3b8;margin-top:4px;">示例数据仅供参考。</p>
+                `;
+                container.appendChild(emptyDiv);
+                bindGlobalEvents();
+                return;
+            }
+
+            appData.days.forEach((day, dayIdx) => {
+                const dayBlock = document.createElement('div');
+                dayBlock.className = 'day-block';
+                dayBlock.dataset.dayIdx = dayIdx;
+
+                const dayHeader = document.createElement('div');
+                dayHeader.className = 'day-header';
+                const dayNameSpan = document.createElement('span');
+                dayNameSpan.className = 'day-name';
+                dayNameSpan.textContent = day.name || '未命名';
+                dayNameSpan.title = '双击编辑日期名称';
+                dayNameSpan.addEventListener('dblclick', function(e) {
+                    e.stopPropagation();
+                    showModal({
+                        title: '编辑日期',
+                        mode: 'day',
+                        defaults: day.name
+                    }).then(newName => {
+                        if (newName && newName.trim()) {
+                            appData.days[dayIdx].name = newName.trim();
+                            saveAppData();
+                            renderApp();
+                            showToast('日期已更新', 'success');
+                        } else if (newName !== null && newName.trim() === '') {
+                            showToast('名称不能为空', 'error');
+                        }
+                    });
+                });
+
+                const dayActions = document.createElement('div');
+                dayActions.className = 'day-actions';
+                dayActions.innerHTML = `
+                    <button class="btn btn-outline add-item-btn" data-dayidx="${dayIdx}">➕ 菜品</button>
+                    <button class="btn-ghost-danger remove-day-btn" data-dayidx="${dayIdx}">✕ 删除</button>
+                `;
+
+                dayHeader.appendChild(dayNameSpan);
+                dayHeader.appendChild(dayActions);
+                dayBlock.appendChild(dayHeader);
+
+                // 菜品列表
+                const wrap = document.createElement('div');
+                wrap.className = 'items-table-wrap';
+                const table = document.createElement('table');
+                table.className = 'items-table';
+
+                const thead = document.createElement('thead');
+                thead.innerHTML = `
+                    <tr>
+                        <th style="width:32px;">序号</th>
+                        <th style="text-align:left;min-width:70px;">品名</th>
+                        <th style="width:80px;">学生</th>
+                        <th style="width:80px;">教师</th>
+                        <th style="width:90px;">合计</th>
+                        <th style="min-width:70px;">备注</th>
+                        <th style="width:36px;"></th>
+                    </tr>
+                `;
+                table.appendChild(thead);
+
+                const tbody = document.createElement('tbody');
+                const items = day.items || [];
+
+                if (items.length === 0) {
+                    const tr = document.createElement('tr');
+                    tr.className = 'empty-row';
+                    tr.innerHTML = `<td colspan="7">暂无菜品，点击 "➕ 菜品" 添加</td>`;
+                    tbody.appendChild(tr);
+                } else {
+                    items.forEach((item, itemIdx) => {
+                        const tr = document.createElement('tr');
+                        tr.dataset.itemIdx = itemIdx;
+                        tr.dataset.dayIdx = dayIdx;
+
+                        const totalVal = item.total !== undefined ? item.total : 0;
+                        const { student, teacher } = calcStudentTeacher(totalVal, sRatio, tRatio);
+
+                        tr.innerHTML = `
+                            <td class="col-idx">${itemIdx + 1}</td>
+                            <td class="col-name"><input type="text" class="item-name" value="${escapeHtml(item.name || '')}" placeholder="品名"></td>
+                            <td class="col-num"><span class="auto-value student-val">${student}</span></td>
+                            <td class="col-num"><span class="auto-value teacher-val">${teacher}</span></td>
+                            <td class="col-num"><input type="number" class="item-total" value="${totalVal}" step="0.01" min="0" placeholder="0"></td>
+                            <td class="col-note"><input type="text" class="item-note" value="${escapeHtml(item.note || '')}" placeholder="备注"></td>
+                            <td class="col-action"><button class="btn remove-item-btn" data-dayidx="${dayIdx}" data-itemidx="${itemIdx}">✕</button></td>
+                        `;
+                        tbody.appendChild(tr);
+                    });
+                }
+
+                table.appendChild(tbody);
+                wrap.appendChild(table);
+
+                // 添加菜品按钮（表格下方）
+                const addRowBtn = document.createElement('button');
+                addRowBtn.className = 'add-row-btn';
+                addRowBtn.textContent = '➕ 添加菜品';
+                addRowBtn.dataset.dayidx = dayIdx;
+                wrap.appendChild(addRowBtn);
+
+                dayBlock.appendChild(wrap);
+                container.appendChild(dayBlock);
+            });
+
+            bindAllEvents();
+            bindGlobalEvents();
+        }
+
+        // ================================================================
+        // 8. 事件绑定（智能体）
+        // ================================================================
+        function bindAllEvents() {
+            const container = document.getElementById('daysContainer');
+
+            // 合计输入
+            container.querySelectorAll('.item-total').forEach(inp => {
+                inp.oninput = function() {
+                    const tr = this.closest('tr');
+                    if (!tr) return;
+                    const dayIdx = parseInt(tr.dataset.dayIdx);
+                    const itemIdx = parseInt(tr.dataset.itemIdx);
+                    if (isNaN(dayIdx) || isNaN(itemIdx)) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    const item = day.items[itemIdx];
+                    if (!item) return;
+
+                    const val = parseFloat(this.value);
+                    const total = isNaN(val) ? 0 : val;
+                    item.total = total;
+
+                    const sRatio = appData.ratioStudent || 7;
+                    const tRatio = appData.ratioTeacher || 1;
+                    const { student, teacher } = calcStudentTeacher(total, sRatio, tRatio);
+                    const studentSpan = tr.querySelector('.student-val');
+                    const teacherSpan = tr.querySelector('.teacher-val');
+                    if (studentSpan) studentSpan.textContent = student;
+                    if (teacherSpan) teacherSpan.textContent = teacher;
+
+                    saveAppData();
+                };
+            });
+
+            // 品名变更
+            container.querySelectorAll('.item-name').forEach(inp => {
+                inp.onchange = function() {
+                    const tr = this.closest('tr');
+                    if (!tr) return;
+                    const dayIdx = parseInt(tr.dataset.dayIdx);
+                    const itemIdx = parseInt(tr.dataset.itemIdx);
+                    if (isNaN(dayIdx) || isNaN(itemIdx)) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    const item = day.items[itemIdx];
+                    if (!item) return;
+                    item.name = this.value.trim() || '未命名';
+                    saveAppData();
+                };
+            });
+
+            // 备注变更
+            container.querySelectorAll('.item-note').forEach(inp => {
+                inp.onchange = function() {
+                    const tr = this.closest('tr');
+                    if (!tr) return;
+                    const dayIdx = parseInt(tr.dataset.dayIdx);
+                    const itemIdx = parseInt(tr.dataset.itemIdx);
+                    if (isNaN(dayIdx) || isNaN(itemIdx)) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    const item = day.items[itemIdx];
+                    if (!item) return;
+                    item.note = this.value.trim() || '';
+                    saveAppData();
+                };
+            });
+
+            // 删除菜品
+            container.querySelectorAll('.remove-item-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const dayIdx = parseInt(this.dataset.dayidx);
+                    const itemIdx = parseInt(this.dataset.itemidx);
+                    if (isNaN(dayIdx) || isNaN(itemIdx)) return;
+                    if (!confirm('确定删除该菜品吗？')) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    day.items.splice(itemIdx, 1);
+                    saveAppData();
+                    renderApp();
+                    showToast('已删除菜品', 'success');
+                };
+            });
+
+            // 删除天
+            container.querySelectorAll('.remove-day-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const dayIdx = parseInt(this.dataset.dayidx);
+                    if (isNaN(dayIdx)) return;
+                    if (appData.days.length <= 1) {
+                        showToast('至少保留一天', 'error');
+                        return;
+                    }
+                    if (!confirm(`确定删除 "${appData.days[dayIdx].name}" 及其所有数据吗？`)) return;
+                    appData.days.splice(dayIdx, 1);
+                    saveAppData();
+                    renderApp();
+                    showToast('已删除', 'success');
+                };
+            });
+
+            // 添加菜品（通过标题按钮）
+            container.querySelectorAll('.add-item-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const dayIdx = parseInt(this.dataset.dayidx);
+                    if (isNaN(dayIdx)) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    const name = prompt('请输入菜品名称：', '新菜品');
+                    if (name === null) return;
+                    const trimmed = name.trim();
+                    if (!trimmed) { showToast('名称不能为空', 'error'); return; }
+                    day.items.push({ name: trimmed, total: 0, note: '' });
+                    saveAppData();
+                    renderApp();
+                    showToast(`已添加菜品：${trimmed}`, 'success');
+                };
+            });
+
+            // 添加菜品（通过表格下方按钮）
+            container.querySelectorAll('.add-row-btn').forEach(btn => {
+                btn.onclick = function(e) {
+                    e.stopPropagation();
+                    const dayIdx = parseInt(this.dataset.dayidx);
+                    if (isNaN(dayIdx)) return;
+                    const day = appData.days[dayIdx];
+                    if (!day) return;
+                    const name = prompt('请输入菜品名称：', '新菜品');
+                    if (name === null) return;
+                    const trimmed = name.trim();
+                    if (!trimmed) { showToast('名称不能为空', 'error'); return; }
+                    day.items.push({ name: trimmed, total: 0, note: '' });
+                    saveAppData();
+                    renderApp();
+                    showToast(`已添加菜品：${trimmed}`, 'success');
+                };
+            });
+        }
+
+        function bindGlobalEvents() {
+            // 比例变更
+            document.getElementById('ratioStudent').onchange = function() {
+                const val = parseInt(this.value);
+                if (isNaN(val) || val < 1) { this.value = 1;
+                    appData.ratioStudent = 1; } else { appData.ratioStudent = val; }
+                saveAppData();
+                renderApp();
+                showToast('比例已更新', 'success');
+            };
+            document.getElementById('ratioTeacher').onchange = function() {
+                const val = parseInt(this.value);
+                if (isNaN(val) || val < 1) { this.value = 1;
+                    appData.ratioTeacher = 1; } else { appData.ratioTeacher = val; }
+                saveAppData();
+                renderApp();
+                showToast('比例已更新', 'success');
+            };
+
+            // 添加新的一天
+            document.getElementById('addDayBtn').onclick = function() {
+                showModal({
+                    title: '添加新的一天',
+                    mode: 'day'
+                }).then(name => {
+                    if (name && name.trim()) {
+                        appData.days.push({
+                            name: name.trim(),
+                            items: []
+                        });
+                        saveAppData();
+                        renderApp();
+                        showToast(`已添加：${name.trim()}`, 'success');
+                    } else if (name !== null && name.trim() === '') {
+                        showToast('名称不能为空', 'error');
+                    }
+                });
+            };
+
+            // 清空数据
+            function clearAllData() {
+                if (!appData || appData.days.length === 0) {
+                    showToast('当前没有数据需要清空', 'warning');
+                    return;
+                }
+                if (confirm('⚠️ 确定要清空所有智能体数据吗？\n此操作不可撤销！')) {
+                    appData.days = [];
+                    saveAppData();
+                    renderApp();
+                    showToast('✅ 已清空所有数据', 'success');
+                }
+            }
+            document.getElementById('clearBtn').onclick = clearAllData;
+            document.getElementById('clearBtn2').onclick = clearAllData;
+
+            // 导出当前数据
+            const exportFn = function() {
+                exportXlsxData(appData);
+            };
+            document.getElementById('exportBtn').onclick = exportFn;
+            document.getElementById('exportBtn2').onclick = exportFn;
+
+            // 草稿箱保存按钮
+            document.getElementById('saveDraftBtn').onclick = function() {
+                const nameInput = document.getElementById('draftNameInput');
+                let name = nameInput.value.trim();
+                if (!name) name = '草稿_' + new Date().toLocaleString('zh-CN', { hour12: false });
+                const draft = addDraft(name, appData);
+                showToast(`草稿 "${draft.name}" 已保存`, 'success');
+                nameInput.value = ''; // 清空输入框
+            };
+
+            // 自动保存定时器（每30秒）
+            if (autoSaveInterval) clearInterval(autoSaveInterval);
+            autoSaveInterval = setInterval(function() {
+                if (appData && appData.days && appData.days.length > 0) {
+                    addDraft('自动保存', appData);
+                    // 显示一个轻提示（不打扰用户）
+                    // 可以更新自动保存状态，但我们不显示toast避免干扰
+                }
+            }, 30000); // 30秒
+        }
+
+        // ================================================================
+        // 9. 导出 .xlsx 通用函数（支持传入数据）
+        // ================================================================
+        function exportXlsxData(data, customFileName) {
+            if (!data) return;
+            // 如果 data 没有 days，视为空
+            if (!data.days) data.days = [];
+            // 确保必要字段
+            const school = data.school || '尚湖初中';
+            const week = data.week || '第2周';
+            const dateRange = data.dateRange || '9月7日 — 9月11日';
+            const contact = data.contact || '王亚俐';
+            const phone = data.phone || '528939';
+            const unit = data.unit || '斤';
+            const days = data.days || [];
+            const sRatio = data.ratioStudent || 7;
+            const tRatio = data.ratioTeacher || 1;
+
+            // 动态加载库
+            const script = document.createElement('script');
+            script.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
+            script.onload = function() {
+                doExport(true);
+            };
+            script.onerror = function() {
+                const fallback = document.createElement('script');
+                fallback.src = 'https://cdn.sheetjs.com/xlsx-0.20.1/package/dist/xlsx.full.min.js';
+                fallback.onload = function() {
+                    doExport(false);
+                };
+                fallback.onerror = function() {
+                    showToast('加载导出库失败，请检查网络', 'error');
+                };
+                document.head.appendChild(fallback);
+            };
+            document.head.appendChild(script);
+
+            function doExport(supportStyle) {
+                try {
+                    const wb = XLSX.utils.book_new();
+                    const rows = [];
+                    const colCount = 26;
+
+                    // 标题
+                    const titleStr = `${school} ${week} 食品订单（${dateRange}）`;
+                    const titleRow = Array(colCount).fill('');
+                    titleRow[0] = titleStr;
+                    rows.push(titleRow);
+
+                    // 信息行
+                    const infoStr =
+                        `学校：${school} 经办人：${contact} 联系电话：${phone} 单位：${unit}`;
+                    const infoRow = [infoStr, ...Array(colCount - 1).fill('')];
+                    rows.push(infoRow);
+
+                    // 日期行
+                    const weekRow = ['序号'];
+                    const dayNames = days.map(d => d.name || '');
+                    while (dayNames.length < 5) dayNames.push('');
+                    dayNames.forEach(name => {
+                        weekRow.push(name, '', '', '', '');
+                    });
+                    while (weekRow.length < colCount) weekRow.push('');
+                    rows.push(weekRow);
+
+                    // 表头1
+                    const headerRow1 = [''];
+                    dayNames.forEach(() => {
+                        headerRow1.push('品名', '', '', '', '备注');
+                    });
+                    while (headerRow1.length < colCount) headerRow1.push('');
+                    rows.push(headerRow1);
+
+                    // 表头2
+                    const headerRow2 = [''];
+                    dayNames.forEach(() => {
+                        headerRow2.push('', '学生', '老师', '合计', '');
+                    });
+                    while (headerRow2.length < colCount) headerRow2.push('');
+                    rows.push(headerRow2);
+
+                    // 数据
+                    let maxItems = 0;
+                    days.forEach(day => {
+                        if (day.items && day.items.length > maxItems) maxItems = day.items.length;
+                    });
+                    if (maxItems === 0) maxItems = 1;
+
+                    for (let i = 0; i < maxItems; i++) {
+                        const rowData = [i + 1];
+                        days.forEach((day) => {
+                            const items = day.items || [];
+                            if (i < items.length) {
+                                const item = items[i];
+                                const total = item.total || 0;
+                                const { student, teacher } = calcStudentTeacher(total, sRatio, tRatio);
+                                rowData.push(
+                                    item.name || '',
+                                    Math.round(student * 100) / 100,
+                                    Math.round(teacher * 100) / 100,
+                                    total,
+                                    item.note || ''
+                                );
+                            } else {
+                                rowData.push('', '', '', '', '');
+                            }
+                        });
+                        while (rowData.length < colCount) rowData.push('');
+                        rows.push(rowData);
+                    }
+
+                    const ws = XLSX.utils.aoa_to_sheet(rows);
+
+                    // 合并单元格
+                    const merges = [];
+                    merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } });
+                    merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: colCount - 1 } });
+                    const dayStartCol = 1;
+                    days.forEach((day, idx) => {
+                        const startC = dayStartCol + idx * 5;
+                        const endC = startC + 4;
+                        merges.push({ s: { r: 2, c: startC }, e: { r: 2, c: endC } });
+                    });
+                    ws['!merges'] = merges;
+
+                    // 列宽
+                    const colWidths = [];
+                    colWidths[0] = { wch: 6 };
+                    for (let i = 0; i < 5; i++) {
+                        colWidths.push({ wch: 12 });
+                        colWidths.push({ wch: 8 });
+                        colWidths.push({ wch: 8 });
+                        colWidths.push({ wch: 8 });
+                        colWidths.push({ wch: 12 });
+                    }
+                    ws['!cols'] = colWidths;
+
+                    // 样式
+                    if (supportStyle && typeof XLSX.utils.sheet_add_aoa === 'function' && ws['!rows'] !== undefined) {
+                        const range = XLSX.utils.decode_range(ws['!ref']);
+                        for (let R = range.s.r; R <= range.e.r; R++) {
+                            for (let C = range.s.c; C <= range.e.c; C++) {
+                                const addr = XLSX.utils.encode_cell({ r: R, c: C });
+                                if (!ws[addr]) continue;
+                                if (!ws[addr].s) ws[addr].s = {};
+                                ws[addr].s.alignment = { horizontal: 'center', vertical: 'center' };
+                                ws[addr].s.border = {
+                                    top: { style: 'thin' },
+                                    bottom: { style: 'thin' },
+                                    left: { style: 'thin' },
+                                    right: { style: 'thin' }
+                                };
+                            }
+                        }
+                        merges.forEach(m => {
+                            for (let R = m.s.r; R <= m.e.r; R++) {
+                                for (let C = m.s.c; C <= m.e.c; C++) {
+                                    const addr = XLSX.utils.encode_cell({ r: R, c: C });
+                                    if (!ws[addr]) continue;
+                                    if (!ws[addr].s) ws[addr].s = {};
+                                    ws[addr].s.alignment = { horizontal: 'center', vertical: 'center' };
+                                    ws[addr].s.border = {
+                                        top: { style: 'thin' },
+                                        bottom: { style: 'thin' },
+                                        left: { style: 'thin' },
+                                        right: { style: 'thin' }
+                                    };
+                                }
+                            }
+                        });
+                    }
+
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    const fileName = customFileName ?
+                        `${customFileName}.xlsx` :
+                        `${school}_食品订单_${dateRange}.xlsx`;
+                    XLSX.writeFile(wb, fileName);
+                    showToast(`导出成功：${fileName}`, 'success');
+                } catch (e) {
+                    console.error(e);
+                    showToast('导出失败：' + e.message, 'error');
+                }
+            }
+        }
+
+        // ================================================================
+        // 10. Toast
+        // ================================================================
+        function showToast(msg, type) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast ' + (type || '');
+            void el.offsetWidth;
+            el.classList.add('show');
+            clearTimeout(el._hideTimer);
+            el._hideTimer = setTimeout(() => {
+                el.classList.remove('show');
+            }, 2200);
+        }
+
+        // ================================================================
+        // 11. 初始化
+        // ================================================================
+        renderSampleData();
+        loadAppData();
+        loadDrafts();
+        renderApp();
+        saveAppData();
+
+        // 绑定周数和日期范围的双击编辑
+        (function bindWeekAndDateEdit() {
+            const weekEl = document.getElementById('weekDisplay');
+            const dateEl = document.getElementById('dateDisplay');
+
+            weekEl.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                const current = appData.week || '第2周';
+                const newVal = prompt('请输入周数（如：第2周）：', current);
+                if (newVal !== null && newVal.trim() !== '') {
+                    appData.week = newVal.trim();
+                    saveAppData();
+                    renderApp();
+                    showToast('周数已更新', 'success');
+                } else if (newVal !== null && newVal.trim() === '') {
+                    showToast('周数不能为空', 'error');
+                }
+            });
+
+            dateEl.addEventListener('dblclick', function(e) {
+                e.stopPropagation();
+                const current = appData.dateRange || '9月7日 — 9月11日';
+                const newVal = prompt('请输入日期范围（如：9月7日 — 9月11日）：', current);
+                if (newVal !== null && newVal.trim() !== '') {
+                    appData.dateRange = newVal.trim();
+                    saveAppData();
+                    renderApp();
+                    showToast('日期范围已更新', 'success');
+                } else if (newVal !== null && newVal.trim() === '') {
+                    showToast('日期范围不能为空', 'error');
+                }
+            });
+        })();
+
+        window.addEventListener('beforeunload', function() {
+            saveAppData();
+            // 最后自动保存一次
+            if (appData && appData.days && appData.days.length > 0) {
+                addDraft('自动保存', appData);
+            }
+        });
+
+        console.log('✅ 智能体表格已启动，草稿箱功能已启用，自动保存每30秒一次，数据保存在 localStorage');
+        console.log('📊 当前智能体数据：', appData);
+    </script>
+</body>
+</html>
