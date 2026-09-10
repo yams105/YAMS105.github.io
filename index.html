@@ -1049,7 +1049,7 @@
         // ================================================================
         // 2. 智能体数据管理
         // ================================================================
-        const STORAGE_KEY = 'foodOrderData_v21';
+        const STORAGE_KEY = 'foodOrderData_v22';
         const DRAFTS_KEY = 'foodOrderDrafts_v1';
 
         let appData = null;
@@ -1137,7 +1137,6 @@
             if (stored) {
                 try {
                     drafts = JSON.parse(stored);
-                    // 确保每个草稿有 id 和 data
                     drafts = drafts.filter(d => d && d.id && d.data);
                 } catch (e) {
                     drafts = [];
@@ -1172,7 +1171,6 @@
                 timestamp: Date.now(),
                 data: cloneDeep(data)
             };
-            // 如果名称为"自动保存"，查找是否有同名草稿并覆盖
             if (name === '自动保存') {
                 const existing = drafts.find(d => d.name === '自动保存');
                 if (existing) {
@@ -1201,9 +1199,7 @@
                 showToast('草稿不存在', 'error');
                 return;
             }
-            // 替换当前数据
             appData = cloneDeep(draft.data);
-            // 确保结构完整
             if (!appData.days) appData.days = [];
             appData.days.forEach(day => {
                 if (!day.items) day.items = [];
@@ -1223,7 +1219,6 @@
                 showToast('草稿不存在', 'error');
                 return;
             }
-            // 导出该草稿数据为xlsx
             exportXlsxData(draft.data, `草稿_${draft.name}_${formatTimestamp(draft.timestamp)}`);
         }
 
@@ -1234,7 +1229,6 @@
                 container.innerHTML = '<div class="empty-drafts">暂无草稿，保存当前数据到草稿箱吧。</div>';
                 return;
             }
-            // 按时间降序排列
             const sorted = [...drafts].sort((a, b) => b.timestamp - a.timestamp);
             let html = '';
             sorted.forEach(d => {
@@ -1255,7 +1249,6 @@
             });
             container.innerHTML = html;
 
-            // 绑定事件
             container.querySelectorAll('.load-draft').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -1288,7 +1281,9 @@
         }
 
         // ================================================================
-        // 4. 计算工具
+        // 4. 计算工具（修复：学生+教师=合计）
+        //   学生 = round(合计 * 学生比例 / 总比例, 2)
+        //   教师 = 合计 - 学生（保证两者相加等于合计）
         // ================================================================
         function calcStudentTeacher(total, sRatio, tRatio) {
             if (total === undefined || total === null || isNaN(total)) return { student: 0, teacher: 0 };
@@ -1296,11 +1291,13 @@
             if (isNaN(num) || num < 0) return { student: 0, teacher: 0 };
             const sum = sRatio + tRatio;
             if (sum === 0) return { student: 0, teacher: 0 };
-            const student = (num * sRatio) / sum;
-            const teacher = (num * tRatio) / sum;
+            // 学生四舍五入到两位小数
+            const student = Math.round((num * sRatio) / sum * 100) / 100;
+            // 教师 = 合计 - 学生，确保两者相加精确等于合计
+            const teacher = Math.round((num - student) * 100) / 100;
             return {
-                student: Math.round(student * 100) / 100,
-                teacher: Math.round(teacher * 100) / 100
+                student: student,
+                teacher: teacher
             };
         }
 
@@ -1429,7 +1426,6 @@
             const container = document.getElementById('daysContainer');
             container.innerHTML = '';
 
-            // 更新头部
             document.getElementById('schoolDisplay').textContent = appData.school || '尚湖初中';
             document.getElementById('contactDisplay').textContent = appData.contact || '王亚俐';
             document.getElementById('phoneDisplay').textContent = appData.phone || '528939';
@@ -1500,7 +1496,6 @@
                 dayHeader.appendChild(dayActions);
                 dayBlock.appendChild(dayHeader);
 
-                // 菜品列表
                 const wrap = document.createElement('div');
                 wrap.className = 'items-table-wrap';
                 const table = document.createElement('table');
@@ -1553,7 +1548,6 @@
                 table.appendChild(tbody);
                 wrap.appendChild(table);
 
-                // 添加菜品按钮（表格下方）
                 const addRowBtn = document.createElement('button');
                 addRowBtn.className = 'add-row-btn';
                 addRowBtn.textContent = '➕ 添加菜品';
@@ -1574,7 +1568,6 @@
         function bindAllEvents() {
             const container = document.getElementById('daysContainer');
 
-            // 合计输入
             container.querySelectorAll('.item-total').forEach(inp => {
                 inp.oninput = function() {
                     const tr = this.closest('tr');
@@ -1603,7 +1596,6 @@
                 };
             });
 
-            // 品名变更
             container.querySelectorAll('.item-name').forEach(inp => {
                 inp.onchange = function() {
                     const tr = this.closest('tr');
@@ -1620,7 +1612,6 @@
                 };
             });
 
-            // 备注变更
             container.querySelectorAll('.item-note').forEach(inp => {
                 inp.onchange = function() {
                     const tr = this.closest('tr');
@@ -1637,7 +1628,6 @@
                 };
             });
 
-            // 删除菜品
             container.querySelectorAll('.remove-item-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -1654,7 +1644,6 @@
                 };
             });
 
-            // 删除天
             container.querySelectorAll('.remove-day-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -1672,7 +1661,6 @@
                 };
             });
 
-            // 添加菜品（通过标题按钮）
             container.querySelectorAll('.add-item-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -1691,7 +1679,6 @@
                 };
             });
 
-            // 添加菜品（通过表格下方按钮）
             container.querySelectorAll('.add-row-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -1712,7 +1699,6 @@
         }
 
         function bindGlobalEvents() {
-            // 比例变更
             document.getElementById('ratioStudent').onchange = function() {
                 const val = parseInt(this.value);
                 if (isNaN(val) || val < 1) { this.value = 1;
@@ -1730,7 +1716,6 @@
                 showToast('比例已更新', 'success');
             };
 
-            // 添加新的一天
             document.getElementById('addDayBtn').onclick = function() {
                 showModal({
                     title: '添加新的一天',
@@ -1750,7 +1735,6 @@
                 });
             };
 
-            // 清空数据
             function clearAllData() {
                 if (!appData || appData.days.length === 0) {
                     showToast('当前没有数据需要清空', 'warning');
@@ -1766,42 +1750,35 @@
             document.getElementById('clearBtn').onclick = clearAllData;
             document.getElementById('clearBtn2').onclick = clearAllData;
 
-            // 导出当前数据
             const exportFn = function() {
                 exportXlsxData(appData);
             };
             document.getElementById('exportBtn').onclick = exportFn;
             document.getElementById('exportBtn2').onclick = exportFn;
 
-            // 草稿箱保存按钮
             document.getElementById('saveDraftBtn').onclick = function() {
                 const nameInput = document.getElementById('draftNameInput');
                 let name = nameInput.value.trim();
                 if (!name) name = '草稿_' + new Date().toLocaleString('zh-CN', { hour12: false });
                 const draft = addDraft(name, appData);
                 showToast(`草稿 "${draft.name}" 已保存`, 'success');
-                nameInput.value = ''; // 清空输入框
+                nameInput.value = '';
             };
 
-            // 自动保存定时器（每30秒）
             if (autoSaveInterval) clearInterval(autoSaveInterval);
             autoSaveInterval = setInterval(function() {
                 if (appData && appData.days && appData.days.length > 0) {
                     addDraft('自动保存', appData);
-                    // 显示一个轻提示（不打扰用户）
-                    // 可以更新自动保存状态，但我们不显示toast避免干扰
                 }
-            }, 30000); // 30秒
+            }, 30000);
         }
 
         // ================================================================
-        // 9. 导出 .xlsx 通用函数（支持传入数据）
+        // 9. 导出 .xlsx 通用函数
         // ================================================================
         function exportXlsxData(data, customFileName) {
             if (!data) return;
-            // 如果 data 没有 days，视为空
             if (!data.days) data.days = [];
-            // 确保必要字段
             const school = data.school || '尚湖初中';
             const week = data.week || '第2周';
             const dateRange = data.dateRange || '9月7日 — 9月11日';
@@ -1812,7 +1789,6 @@
             const sRatio = data.ratioStudent || 7;
             const tRatio = data.ratioTeacher || 1;
 
-            // 动态加载库
             const script = document.createElement('script');
             script.src = 'https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
             script.onload = function() {
@@ -1837,19 +1813,16 @@
                     const rows = [];
                     const colCount = 26;
 
-                    // 标题
                     const titleStr = `${school} ${week} 食品订单（${dateRange}）`;
                     const titleRow = Array(colCount).fill('');
                     titleRow[0] = titleStr;
                     rows.push(titleRow);
 
-                    // 信息行
                     const infoStr =
                         `学校：${school} 经办人：${contact} 联系电话：${phone} 单位：${unit}`;
                     const infoRow = [infoStr, ...Array(colCount - 1).fill('')];
                     rows.push(infoRow);
 
-                    // 日期行
                     const weekRow = ['序号'];
                     const dayNames = days.map(d => d.name || '');
                     while (dayNames.length < 5) dayNames.push('');
@@ -1859,7 +1832,6 @@
                     while (weekRow.length < colCount) weekRow.push('');
                     rows.push(weekRow);
 
-                    // 表头1
                     const headerRow1 = [''];
                     dayNames.forEach(() => {
                         headerRow1.push('品名', '', '', '', '备注');
@@ -1867,7 +1839,6 @@
                     while (headerRow1.length < colCount) headerRow1.push('');
                     rows.push(headerRow1);
 
-                    // 表头2
                     const headerRow2 = [''];
                     dayNames.forEach(() => {
                         headerRow2.push('', '学生', '老师', '合计', '');
@@ -1875,7 +1846,6 @@
                     while (headerRow2.length < colCount) headerRow2.push('');
                     rows.push(headerRow2);
 
-                    // 数据
                     let maxItems = 0;
                     days.forEach(day => {
                         if (day.items && day.items.length > maxItems) maxItems = day.items.length;
@@ -1907,7 +1877,6 @@
 
                     const ws = XLSX.utils.aoa_to_sheet(rows);
 
-                    // 合并单元格
                     const merges = [];
                     merges.push({ s: { r: 0, c: 0 }, e: { r: 0, c: colCount - 1 } });
                     merges.push({ s: { r: 1, c: 0 }, e: { r: 1, c: colCount - 1 } });
@@ -1919,7 +1888,6 @@
                     });
                     ws['!merges'] = merges;
 
-                    // 列宽
                     const colWidths = [];
                     colWidths[0] = { wch: 6 };
                     for (let i = 0; i < 5; i++) {
@@ -1931,7 +1899,6 @@
                     }
                     ws['!cols'] = colWidths;
 
-                    // 样式
                     if (supportStyle && typeof XLSX.utils.sheet_add_aoa === 'function' && ws['!rows'] !== undefined) {
                         const range = XLSX.utils.decode_range(ws['!ref']);
                         for (let R = range.s.r; R <= range.e.r; R++) {
@@ -2003,7 +1970,6 @@
         renderApp();
         saveAppData();
 
-        // 绑定周数和日期范围的双击编辑
         (function bindWeekAndDateEdit() {
             const weekEl = document.getElementById('weekDisplay');
             const dateEl = document.getElementById('dateDisplay');
@@ -2039,13 +2005,12 @@
 
         window.addEventListener('beforeunload', function() {
             saveAppData();
-            // 最后自动保存一次
             if (appData && appData.days && appData.days.length > 0) {
                 addDraft('自动保存', appData);
             }
         });
 
-        console.log('✅ 智能体表格已启动，草稿箱功能已启用，自动保存每30秒一次，数据保存在 localStorage');
+        console.log('✅ 智能体表格已启动，学生+教师=合计（已修复），数据保存在 localStorage');
         console.log('📊 当前智能体数据：', appData);
     </script>
 </body>
