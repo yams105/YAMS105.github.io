@@ -5,163 +5,64 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.5, user-scalable=yes">
     <title>尚湖初中 食品订单管理</title>
     <style>
-        /* ===== 全局重置 & 基础 ===== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: -apple-system, 'Segoe UI', 'PingFang SC', Roboto, 'Helvetica Neue', sans-serif;
-            background: #f0f4f8;
-            padding: 12px;
-            color: #1e293b;
-            -webkit-text-size-adjust: 100%;
-            -webkit-tap-highlight-color: transparent;
+            background: #f0f4f8; padding: 12px; color: #1e293b;
+            -webkit-text-size-adjust: 100%; -webkit-tap-highlight-color: transparent;
         }
         .app-container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: #ffffff;
-            border-radius: 16px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            max-width: 1400px; margin: 0 auto; background: #ffffff;
+            border-radius: 16px; box-shadow: 0 10px 40px rgba(0,0,0,0.08);
             padding: 16px 16px 24px;
         }
-
-        /* ===== 头部 ===== */
         .header {
-            border-bottom: 3px solid #2563eb;
-            padding-bottom: 12px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 10px;
+            border-bottom: 3px solid #2563eb; padding-bottom: 12px;
+            margin-bottom: 16px; display: flex; flex-wrap: wrap;
+            justify-content: space-between; align-items: center; gap: 10px;
         }
         .header h1 {
-            font-size: clamp(18px, 5vw, 26px);
-            font-weight: 700;
-            color: #0f172a;
-            letter-spacing: 0.5px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 4px 6px;
-            line-height: 1.3;
+            font-size: clamp(18px, 5vw, 26px); font-weight: 700; color: #0f172a;
+            letter-spacing: 0.5px; display: flex; flex-wrap: wrap;
+            align-items: center; gap: 4px 6px; line-height: 1.3;
         }
         .header h1 .editable-span {
-            cursor: pointer;
-            padding: 0 4px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            border-bottom: 2px solid transparent;
-            font-weight: 700;
+            cursor: pointer; padding: 0 4px; border-radius: 4px;
+            transition: background 0.2s; border-bottom: 2px solid transparent; font-weight: 700;
         }
-        .header h1 .editable-span:hover {
-            background: #eef2f6;
-            border-bottom-color: #2563eb;
-        }
+        .header h1 .editable-span:hover { background: #eef2f6; border-bottom-color: #2563eb; }
         .header h1 .editable-span:active { background: #dbeafe; }
-        .header h1 small {
-            font-size: clamp(14px, 3.5vw, 18px);
-            font-weight: 400;
-            color: #475569;
-            margin-left: 2px;
-            display: inline-flex;
-            align-items: center;
-        }
+        .header h1 small { font-size: clamp(14px, 3.5vw, 18px); font-weight: 400; color: #475569; margin-left: 2px; display: inline-flex; align-items: center; }
         .header-info {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px 16px;
-            font-size: clamp(12px, 2.8vw, 15px);
-            color: #334155;
-            background: #f8fafc;
-            padding: 6px 14px;
-            border-radius: 40px;
-            border: 1px solid #e2e8f0;
-            width: 100%;
-            justify-content: center;
+            display: flex; flex-wrap: wrap; gap: 8px 16px; font-size: clamp(12px, 2.8vw, 15px);
+            color: #334155; background: #f8fafc; padding: 6px 14px;
+            border-radius: 40px; border: 1px solid #e2e8f0; width: 100%; justify-content: center;
         }
         .header-info span { white-space: nowrap; }
         .header-info strong { color: #0f172a; }
 
-        /* ===== 工具栏 ===== */
         .toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 12px 16px;
-            margin-bottom: 16px;
-            background: #f8fafc;
-            padding: 12px 16px;
-            border-radius: 14px;
-            border: 1px solid #e2e8f0;
+            display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px;
+            margin-bottom: 16px; background: #f8fafc; padding: 12px 16px;
+            border-radius: 14px; border: 1px solid #e2e8f0;
         }
-        .toolbar .ratio-group {
-            display: flex;
-            align-items: center;
-            gap: 6px 10px;
-            flex-wrap: wrap;
-            flex: 1 1 auto;
-        }
-        .toolbar .ratio-group label {
-            font-weight: 600;
-            font-size: clamp(13px, 2.8vw, 15px);
-            color: #1e293b;
-        }
+        .toolbar .ratio-group { display: flex; align-items: center; gap: 6px 10px; flex-wrap: wrap; flex: 1 1 auto; }
+        .toolbar .ratio-group label { font-weight: 600; font-size: clamp(13px, 2.8vw, 15px); color: #1e293b; }
         .toolbar .ratio-group input {
-            width: 50px;
-            padding: 4px 4px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: clamp(14px, 3vw, 16px);
-            text-align: center;
-            font-weight: 600;
-            background: #ffffff;
-            transition: border-color 0.2s;
-            min-height: 36px;
+            width: 50px; padding: 4px; border: 1.5px solid #cbd5e1; border-radius: 8px;
+            font-size: clamp(14px, 3vw, 16px); text-align: center; font-weight: 600;
+            background: #ffffff; transition: border-color 0.2s; min-height: 36px;
         }
-        .toolbar .ratio-group input:focus {
-            border-color: #2563eb;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
-        }
-        .toolbar .ratio-group .ratio-colon {
-            font-weight: 700;
-            font-size: clamp(16px, 3.5vw, 20px);
-            color: #475569;
-        }
-        .toolbar .ratio-group .ratio-hint {
-            font-weight: 500;
-            color: #475569;
-            font-size: clamp(11px, 2.4vw, 14px);
-            margin-left: 2px;
-        }
-        .toolbar .btn-group {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-left: auto;
-        }
+        .toolbar .ratio-group input:focus { border-color: #2563eb; outline: none; box-shadow: 0 0 0 3px rgba(37,99,235,0.15); }
+        .toolbar .ratio-group .ratio-colon { font-weight: 700; font-size: clamp(16px, 3.5vw, 20px); color: #475569; }
+        .toolbar .ratio-group .ratio-hint { font-weight: 500; color: #475569; font-size: clamp(11px, 2.4vw, 14px); margin-left: 2px; }
+        .toolbar .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-left: auto; }
         .btn {
-            padding: 8px 16px;
-            border: none;
-            border-radius: 40px;
-            font-size: clamp(12px, 2.6vw, 14px);
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            background: #e2e8f0;
-            color: #1e293b;
-            touch-action: manipulation;
-            min-height: 40px;
-            justify-content: center;
-            white-space: nowrap;
+            padding: 8px 16px; border: none; border-radius: 40px;
+            font-size: clamp(12px, 2.6vw, 14px); font-weight: 600; cursor: pointer;
+            transition: all 0.2s; display: inline-flex; align-items: center; gap: 4px;
+            background: #e2e8f0; color: #1e293b; touch-action: manipulation;
+            min-height: 40px; justify-content: center; white-space: nowrap;
         }
         .btn:active { transform: scale(0.96); }
         .btn-primary { background: #2563eb; color: #fff; }
@@ -170,722 +71,310 @@
         .btn-success:active { background: #15803d; }
         .btn-danger { background: #dc2626; color: #fff; }
         .btn-danger:active { background: #b91c1c; }
-        .btn-outline {
-            background: transparent;
-            border: 1.5px solid #cbd5e1;
-        }
+        .btn-outline { background: transparent; border: 1.5px solid #cbd5e1; }
         .btn-outline:active { background: #f1f5f9; }
         .btn-ghost-danger {
-            background: transparent;
-            color: #94a3b8;
-            border: 1px solid transparent;
-            padding: 2px 10px;
-            border-radius: 30px;
-            font-size: clamp(12px, 2.4vw, 13px);
-            cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            min-height: 32px;
+            background: transparent; color: #94a3b8; border: 1px solid transparent;
+            padding: 2px 10px; border-radius: 30px; font-size: clamp(12px, 2.4vw, 13px);
+            cursor: pointer; transition: all 0.2s; touch-action: manipulation; min-height: 32px;
         }
-        .btn-ghost-danger:active {
-            background: #fee2e2;
-            color: #dc2626;
-            border-color: #fecaca;
-        }
-        .btn-warning { background: #f59e0b; color: #fff; }
-        .btn-warning:active { background: #d97706; }
+        .btn-ghost-danger:active { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .btn-info { background: #0ea5e9; color: #fff; }
         .btn-info:active { background: #0284c7; }
-        .btn-sm {
-            padding: 4px 10px;
-            font-size: clamp(11px, 2.2vw, 13px);
-            min-height: 30px;
-        }
+        .btn-sm { padding: 4px 10px; font-size: clamp(11px, 2.2vw, 13px); min-height: 30px; }
 
-        /* ===== 示例数据区域 ===== */
-        .sample-section {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 12px 14px;
-            margin-bottom: 20px;
-        }
+        .sample-section { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 12px 14px; margin-bottom: 20px; }
         .sample-section .sample-title {
-            font-size: clamp(14px, 3vw, 16px);
-            font-weight: 600;
-            color: #475569;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+            font-size: clamp(14px, 3vw, 16px); font-weight: 600; color: #475569;
+            margin-bottom: 8px; display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
         }
         .sample-section .sample-title .badge {
-            background: #e2e8f0;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-size: clamp(10px, 2vw, 12px);
-            color: #475569;
+            background: #e2e8f0; padding: 2px 12px; border-radius: 30px;
+            font-size: clamp(10px, 2vw, 12px); color: #475569;
         }
-        .sample-table-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            max-height: 360px;
-            overflow-y: auto;
-        }
+        .sample-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; max-height: 360px; overflow-y: auto; }
         .sample-table {
-            width: 100%;
-            min-width: 420px;
-            border-collapse: collapse;
-            font-size: clamp(11px, 2.4vw, 13px);
-            background: #ffffff;
-            border-radius: 8px;
+            width: 100%; min-width: 420px; border-collapse: collapse;
+            font-size: clamp(11px, 2.4vw, 13px); background: #ffffff; border-radius: 8px;
         }
-        .sample-table th {
-            background: #e9edf4;
-            padding: 5px 6px;
-            border: 1px solid #d1d9e6;
-            text-align: center;
-            font-weight: 600;
-            color: #1e293b;
-            white-space: nowrap;
-        }
-        .sample-table td {
-            padding: 4px 6px;
-            border: 1px solid #d1d9e6;
-            text-align: center;
-            word-break: break-word;
-        }
+        .sample-table th { background: #e9edf4; padding: 5px 6px; border: 1px solid #d1d9e6; text-align: center; font-weight: 600; color: #1e293b; white-space: nowrap; }
+        .sample-table td { padding: 4px 6px; border: 1px solid #d1d9e6; text-align: center; word-break: break-word; }
 
-        /* ===== 智能体表格区域 ===== */
-        .agent-header {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-            gap: 8px;
-        }
-        .agent-header h2 {
-            font-size: clamp(16px, 4vw, 20px);
-            font-weight: 600;
-            color: #0f172a;
-        }
-        .agent-header .save-hint {
-            font-size: clamp(11px, 2.4vw, 14px);
-            color: #64748b;
-        }
+        .agent-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; margin-bottom: 12px; gap: 8px; }
+        .agent-header h2 { font-size: clamp(16px, 4vw, 20px); font-weight: 600; color: #0f172a; }
+        .agent-header .save-hint { font-size: clamp(11px, 2.4vw, 14px); color: #64748b; }
 
         .day-block {
-            background: #ffffff;
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            margin-bottom: 16px;
-            overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+            background: #ffffff; border: 1px solid #e2e8f0; border-radius: 14px;
+            margin-bottom: 16px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.03);
         }
         .day-block:last-child { margin-bottom: 0; }
         .day-header {
-            background: #f1f5f9;
-            padding: 10px 14px;
-            font-size: clamp(15px, 3.8vw, 18px);
-            font-weight: 700;
-            color: #0f172a;
-            border-bottom: 1px solid #e2e8f0;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            cursor: default;
+            background: #f1f5f9; padding: 10px 14px; font-size: clamp(15px, 3.8vw, 18px);
+            font-weight: 700; color: #0f172a; border-bottom: 1px solid #e2e8f0;
+            display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center;
+            gap: 8px; cursor: default;
         }
-        .day-header .day-name {
-            cursor: pointer;
-            padding: 2px 6px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            flex: 1 1 auto;
-        }
+        .day-header .day-name { cursor: pointer; padding: 2px 6px; border-radius: 4px; transition: background 0.2s; flex: 1 1 auto; }
         .day-header .day-name:hover { background: #e2e8f0; }
-        .day-header .day-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .day-header .day-actions .btn {
-            padding: 4px 12px;
-            font-size: clamp(11px, 2.2vw, 13px);
-            min-height: 32px;
-        }
+        .day-header .day-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .day-header .day-actions .btn { padding: 4px 12px; font-size: clamp(11px, 2.2vw, 13px); min-height: 32px; }
 
-        /* 菜品容器 */
-        .dish-block {
-            border-bottom: 1px dashed #e2e8f0;
-            padding-bottom: 8px;
-            margin-bottom: 8px;
-        }
-        .dish-block:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
+        .dish-block { border-bottom: 1px dashed #e2e8f0; padding-bottom: 8px; margin-bottom: 8px; }
+        .dish-block:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
         .dish-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 14px;
-            background: #fafcff;
-            border-top: 1px solid #e2e8f0;
-            border-bottom: 1px solid #e2e8f0;
-            gap: 8px;
-            flex-wrap: wrap;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 8px 14px; background: #fafcff; border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0; gap: 8px; flex-wrap: wrap;
         }
         .dish-header .dish-name {
-            font-weight: 700;
-            font-size: clamp(13px, 3vw, 15px);
-            color: #1e40af;
-            cursor: pointer;
-            padding: 2px 8px;
-            border-radius: 4px;
-            transition: background 0.2s;
-            background: #dbeafe;
+            font-weight: 700; font-size: clamp(13px, 3vw, 15px); color: #1e40af;
+            cursor: pointer; padding: 2px 8px; border-radius: 4px;
+            transition: background 0.2s; background: #dbeafe;
         }
         .dish-header .dish-name:hover { background: #bfdbfe; }
-        .dish-header .dish-actions {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .dish-header .dish-actions .btn {
-            padding: 3px 10px;
-            font-size: clamp(10px, 2.2vw, 12px);
-            min-height: 28px;
-        }
+        .dish-header .dish-actions { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+        .dish-header .dish-actions .btn { padding: 3px 10px; font-size: clamp(10px, 2.2vw, 12px); min-height: 28px; }
 
-        /* 菜品内“往期原材料”下拉框 */
-        .past-raw-select {
-            padding: 4px 8px;
-            border: 1.5px solid #0ea5e9;
-            border-radius: 8px;
-            font-size: clamp(10px, 2.2vw, 12px);
-            max-width: 160px;
-            background: #f0f9ff;
-            color: #0c4a6e;
-            cursor: pointer;
-            min-height: 28px;
-            font-weight: 600;
-        }
-        .past-raw-select:focus {
-            border-color: #0284c7;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.15);
-        }
-
-        /* 菜品内原材料表格 */
-        .items-table-wrap {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-            padding: 0 2px 2px 2px;
-        }
-        .items-table {
-            width: 100%;
-            min-width: 480px;
-            border-collapse: collapse;
-            font-size: clamp(12px, 2.6vw, 14px);
-        }
+        .items-table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 2px 2px 2px; }
+        .items-table { width: 100%; min-width: 480px; border-collapse: collapse; font-size: clamp(12px, 2.6vw, 14px); }
         .items-table th {
-            background: #f1f5f9;
-            text-align: center;
-            padding: 6px 4px;
-            font-weight: 600;
-            color: #334155;
-            border-bottom: 2px solid #d1d9e6;
-            font-size: clamp(11px, 2.2vw, 13px);
-            white-space: nowrap;
+            background: #f1f5f9; text-align: center; padding: 6px 4px;
+            font-weight: 600; color: #334155; border-bottom: 2px solid #d1d9e6;
+            font-size: clamp(11px, 2.2vw, 13px); white-space: nowrap;
         }
         .items-table td {
-            padding: 4px 4px;
-            border-bottom: 1px solid #eef2f6;
-            vertical-align: middle;
-            text-align: center;
+            padding: 4px; border-bottom: 1px solid #eef2f6;
+            vertical-align: middle; text-align: center;
         }
         .items-table tr:last-child td { border-bottom: none; }
-        .items-table .col-name {
-            min-width: 70px;
-            text-align: left;
-            font-weight: 500;
-        }
+        .items-table .col-name { min-width: 70px; text-align: left; font-weight: 500; }
         .items-table .col-name input {
-            width: 100%;
-            min-width: 50px;
-            border: 1px solid transparent;
-            background: transparent;
-            padding: 3px 4px;
-            border-radius: 4px;
-            font-size: clamp(12px, 2.6vw, 14px);
-            font-weight: 500;
+            width: 100%; min-width: 50px; border: 1px solid transparent;
+            background: transparent; padding: 3px 4px; border-radius: 4px;
+            font-size: clamp(12px, 2.6vw, 14px); font-weight: 500;
             transition: border-color 0.2s, background 0.2s;
         }
         .items-table .col-name input:hover { background: #f8fafc; }
         .items-table .col-name input:focus {
-            border-color: #2563eb;
-            background: #ffffff;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.12);
+            border-color: #2563eb; background: #ffffff; outline: none;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.12);
         }
         .items-table .col-num input {
-            width: 60px;
-            max-width: 100%;
-            text-align: center;
-            padding: 3px 2px;
-            border: 1.5px solid #e2e8f0;
-            border-radius: 6px;
-            font-size: clamp(12px, 2.6vw, 14px);
-            font-weight: 500;
-            background: #ffffff;
+            width: 60px; max-width: 100%; text-align: center; padding: 3px 2px;
+            border: 1.5px solid #e2e8f0; border-radius: 6px;
+            font-size: clamp(12px, 2.6vw, 14px); font-weight: 500; background: #ffffff;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
         .items-table .col-num input:focus {
-            border-color: #2563eb;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.10);
+            border-color: #2563eb; outline: none;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
         }
         .items-table .col-num .auto-value {
-            display: inline-block;
-            min-width: 36px;
-            padding: 3px 2px;
-            font-weight: 600;
-            color: #0f172a;
-            background: #f8fafc;
-            border-radius: 4px;
-            font-size: clamp(12px, 2.6vw, 14px);
+            display: inline-block; min-width: 36px; padding: 3px 2px;
+            font-weight: 600; color: #0f172a; background: #f8fafc;
+            border-radius: 4px; font-size: clamp(12px, 2.6vw, 14px);
         }
         .items-table .col-note input {
-            width: 100%;
-            min-width: 50px;
-            border: 1px solid transparent;
-            background: transparent;
-            padding: 3px 4px;
-            border-radius: 4px;
-            font-size: clamp(11px, 2.4vw, 13px);
-            color: #475569;
+            width: 100%; min-width: 50px; border: 1px solid transparent;
+            background: transparent; padding: 3px 4px; border-radius: 4px;
+            font-size: clamp(11px, 2.4vw, 13px); color: #475569;
             transition: border-color 0.2s, background 0.2s;
         }
         .items-table .col-note input:hover { background: #f8fafc; }
         .items-table .col-note input:focus {
-            border-color: #2563eb;
-            background: #ffffff;
-            outline: none;
-            box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.10);
+            border-color: #2563eb; background: #ffffff; outline: none;
+            box-shadow: 0 0 0 2px rgba(37,99,235,0.10);
         }
-        .items-table .col-action {
-            width: 36px;
-            text-align: center;
-        }
+        .items-table .col-action { width: 36px; text-align: center; }
         .items-table .col-action .btn {
-            padding: 2px 6px;
-            font-size: clamp(11px, 2.2vw, 13px);
-            border-radius: 30px;
-            background: transparent;
-            color: #94a3b8;
-            border: 1px solid transparent;
-            min-height: 28px;
+            padding: 2px 6px; font-size: clamp(11px, 2.2vw, 13px);
+            border-radius: 30px; background: transparent; color: #94a3b8;
+            border: 1px solid transparent; min-height: 28px;
         }
-        .items-table .col-action .btn:active {
-            background: #fee2e2;
-            color: #dc2626;
-            border-color: #fecaca;
-        }
+        .items-table .col-action .btn:active { background: #fee2e2; color: #dc2626; border-color: #fecaca; }
         .items-table .col-idx {
-            width: 28px;
-            text-align: center;
-            font-size: clamp(11px, 2.2vw, 13px);
-            color: #94a3b8;
-            font-weight: 500;
+            width: 28px; text-align: center; font-size: clamp(11px, 2.2vw, 13px);
+            color: #94a3b8; font-weight: 500;
         }
         .items-table .empty-row td {
-            padding: 12px 10px;
-            color: #94a3b8;
-            font-style: italic;
-            text-align: center;
-            font-size: clamp(11px, 2.2vw, 13px);
+            padding: 12px 10px; color: #94a3b8; font-style: italic;
+            text-align: center; font-size: clamp(11px, 2.2vw, 13px);
         }
 
         .add-row-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 3px 12px;
-            margin: 4px 0 6px 12px;
-            border: 1.5px dashed #cbd5e1;
-            border-radius: 30px;
-            background: transparent;
-            font-size: clamp(11px, 2.2vw, 12px);
-            font-weight: 500;
-            color: #475569;
-            cursor: pointer;
-            transition: all 0.2s;
-            touch-action: manipulation;
-            min-height: 30px;
+            display: inline-flex; align-items: center; gap: 4px; padding: 3px 12px;
+            margin: 4px 0 6px 12px; border: 1.5px dashed #cbd5e1;
+            border-radius: 30px; background: transparent;
+            font-size: clamp(11px, 2.2vw, 12px); font-weight: 500; color: #475569;
+            cursor: pointer; transition: all 0.2s; touch-action: manipulation; min-height: 30px;
         }
-        .add-row-btn:active {
-            border-color: #2563eb;
-            color: #2563eb;
-            background: #eff6ff;
-        }
+        .add-row-btn:active { border-color: #2563eb; color: #2563eb; background: #eff6ff; }
 
-        /* ===== 草稿箱样式 ===== */
-        .draft-section {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 2px solid #e2e8f0;
-        }
-        .draft-header {
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .draft-header h3 {
-            font-size: clamp(16px, 3.5vw, 18px);
-            font-weight: 600;
-            color: #0f172a;
-            margin-right: 8px;
-        }
-        .draft-header .draft-input-group {
-            display: flex;
-            gap: 6px;
-            flex-wrap: wrap;
-            align-items: center;
-            flex: 1 1 auto;
-        }
+        .draft-section { margin-top: 20px; padding-top: 16px; border-top: 2px solid #e2e8f0; }
+        .draft-header { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-bottom: 10px; }
+        .draft-header h3 { font-size: clamp(16px, 3.5vw, 18px); font-weight: 600; color: #0f172a; margin-right: 8px; }
+        .draft-header .draft-input-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; flex: 1 1 auto; }
         .draft-header .draft-input-group input {
-            padding: 6px 10px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: clamp(13px, 2.6vw, 14px);
-            min-width: 120px;
-            flex: 1 1 150px;
-            min-height: 36px;
+            padding: 6px 10px; border: 1.5px solid #cbd5e1; border-radius: 8px;
+            font-size: clamp(13px, 2.6vw, 14px); min-width: 120px;
+            flex: 1 1 150px; min-height: 36px;
         }
         .draft-header .draft-input-group input:focus {
-            border-color: #2563eb;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            border-color: #2563eb; outline: none;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
         }
-        .draft-list {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            max-height: 200px;
-            overflow-y: auto;
-            padding: 4px 0;
-        }
+        .draft-list { display: flex; flex-wrap: wrap; gap: 8px; max-height: 200px; overflow-y: auto; padding: 4px 0; }
         .draft-item {
-            background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            padding: 6px 12px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            gap: 6px 10px;
-            font-size: clamp(12px, 2.4vw, 14px);
-            width: 100%;
+            background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;
+            padding: 6px 12px; display: flex; flex-wrap: wrap; align-items: center;
+            gap: 6px 10px; font-size: clamp(12px, 2.4vw, 14px); width: 100%;
         }
-        .draft-item .draft-info {
-            flex: 1 1 150px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px 12px;
-        }
-        .draft-item .draft-info .draft-name {
-            font-weight: 600;
-            color: #0f172a;
-        }
-        .draft-item .draft-info .draft-time {
-            color: #64748b;
-            font-size: clamp(11px, 2.2vw, 13px);
-        }
-        .draft-item .draft-actions {
-            display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-        }
-        .draft-item .draft-actions .btn {
-            padding: 2px 10px;
-            font-size: clamp(11px, 2.2vw, 13px);
-            min-height: 28px;
-        }
-        .empty-drafts {
-            color: #94a3b8;
-            font-style: italic;
-            padding: 8px 0;
-        }
+        .draft-item .draft-info { flex: 1 1 150px; display: flex; flex-wrap: wrap; gap: 4px 12px; }
+        .draft-item .draft-info .draft-name { font-weight: 600; color: #0f172a; }
+        .draft-item .draft-info .draft-time { color: #64748b; font-size: clamp(11px, 2.2vw, 13px); }
+        .draft-item .draft-actions { display: flex; gap: 4px; flex-wrap: wrap; }
+        .draft-item .draft-actions .btn { padding: 2px 10px; font-size: clamp(11px, 2.2vw, 13px); min-height: 28px; }
+        .empty-drafts { color: #94a3b8; font-style: italic; padding: 8px 0; }
         .auto-save-badge {
-            background: #dbeafe;
-            color: #1d4ed8;
-            border-radius: 30px;
-            padding: 0 10px;
-            font-size: clamp(10px, 2vw, 12px);
-            font-weight: 500;
+            background: #dbeafe; color: #1d4ed8; border-radius: 30px;
+            padding: 0 10px; font-size: clamp(10px, 2vw, 12px); font-weight: 500;
         }
 
-        /* ===== 往期菜品/原材料历史样式 ===== */
         .dish-card {
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            padding: 10px 14px;
-            background: #ffffff;
+            border: 1px solid #e2e8f0; border-radius: 10px;
+            margin-bottom: 10px; padding: 10px 14px; background: #ffffff;
         }
         .dish-card .dish-card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 6px;
-            flex-wrap: wrap;
-            gap: 6px;
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 6px; flex-wrap: wrap; gap: 6px;
         }
         .dish-card .dish-card-title {
-            font-weight: 700;
-            font-size: clamp(14px, 3vw, 16px);
-            color: #0f172a;
+            font-weight: 700; font-size: clamp(14px, 3vw, 16px); color: #0f172a;
         }
-        .dish-card .dish-card-meta {
-            font-size: clamp(11px, 2.2vw, 13px);
-            color: #64748b;
+        .dish-card .dish-card-title .belong-dish {
+            font-size: clamp(11px, 2.2vw, 13px); color: #0ea5e9; font-weight: 600;
+            background: #e0f2fe; padding: 1px 8px; border-radius: 4px; margin-left: 6px;
         }
+        .dish-card .dish-card-meta { font-size: clamp(11px, 2.2vw, 13px); color: #64748b; }
         .dish-card .dish-card-latest {
-            font-size: clamp(12px, 2.4vw, 13px);
-            color: #334155;
-            margin-bottom: 8px;
-            padding: 8px 10px;
-            background: #f0f9ff;
-            border-radius: 6px;
-            border-left: 3px solid #0ea5e9;
+            font-size: clamp(12px, 2.4vw, 13px); color: #334155;
+            margin-bottom: 8px; padding: 8px 10px; background: #f0f9ff;
+            border-radius: 6px; border-left: 3px solid #0ea5e9;
         }
-        .dish-card .dish-card-latest .label {
-            font-weight: 600;
-            color: #0c4a6e;
-            margin-right: 4px;
-        }
+        .dish-card .dish-card-latest .label { font-weight: 600; color: #0c4a6e; margin-right: 4px; }
         .dish-card details summary {
-            cursor: pointer;
-            font-size: clamp(11px, 2.2vw, 13px);
-            color: #475569;
-            font-weight: 500;
-            padding: 6px 0;
-            user-select: none;
-            list-style: none;
+            cursor: pointer; font-size: clamp(11px, 2.2vw, 13px);
+            color: #475569; font-weight: 500; padding: 6px 0;
+            user-select: none; list-style: none;
         }
         .dish-card details summary::-webkit-details-marker { display: none; }
-        .dish-card details summary::before {
-            content: '▶ ';
-            font-size: 10px;
-            color: #94a3b8;
-        }
+        .dish-card details summary::before { content: '▶ '; font-size: 10px; color: #94a3b8; }
         .dish-card details[open] summary::before { content: '▼ '; }
         .dish-card details summary:hover { color: #2563eb; }
         .history-snapshot {
-            padding: 8px 10px;
-            border-bottom: 1px dashed #eef2f6;
-            background: #fafcff;
-            border-radius: 6px;
-            margin-bottom: 6px;
+            padding: 8px 10px; border-bottom: 1px dashed #eef2f6;
+            background: #fafcff; border-radius: 6px; margin-bottom: 6px;
             font-size: clamp(11px, 2.2vw, 13px);
         }
         .history-snapshot:last-child { margin-bottom: 0; }
         .history-snapshot .snap-time {
-            color: #94a3b8;
-            font-size: clamp(10px, 2vw, 12px);
-            display: block;
-            margin-bottom: 4px;
+            color: #94a3b8; font-size: clamp(10px, 2vw, 12px);
+            display: block; margin-bottom: 4px;
         }
         .history-snapshot .item-tag {
-            display: inline-block;
-            background: #ffffff;
-            border: 1px solid #d1d9e6;
-            border-radius: 4px;
-            padding: 1px 6px;
-            margin: 2px 4px 2px 0;
-            font-size: clamp(10px, 2vw, 12px);
-            color: #334155;
+            display: inline-block; background: #ffffff; border: 1px solid #d1d9e6;
+            border-radius: 4px; padding: 1px 6px; margin: 2px 4px 2px 0;
+            font-size: clamp(10px, 2vw, 12px); color: #334155;
         }
         .history-snapshot .item-tag strong { color: #0f172a; }
 
-        /* 往期原材料选择列表 */
         .raw-material-item {
-            padding: 8px 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            margin-bottom: 6px;
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            background: #ffffff;
-            transition: all 0.2s;
+            padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 8px;
+            margin-bottom: 6px; cursor: pointer; display: flex;
+            justify-content: space-between; align-items: center; gap: 8px;
+            background: #ffffff; transition: all 0.2s;
         }
         .raw-material-item:hover {
-            border-color: #0ea5e9;
-            background: #f0f9ff;
-            transform: translateX(2px);
+            border-color: #0ea5e9; background: #f0f9ff; transform: translateX(2px);
         }
         .raw-material-item .raw-name {
-            font-weight: 600;
-            color: #0f172a;
+            font-weight: 600; color: #0f172a;
             font-size: clamp(13px, 2.6vw, 15px);
         }
         .raw-material-item .raw-meta {
-            font-size: clamp(11px, 2.2vw, 13px);
-            color: #64748b;
-            margin-top: 2px;
+            font-size: clamp(11px, 2.2vw, 13px); color: #64748b; margin-top: 2px;
         }
         .raw-material-item .raw-count {
-            font-size: clamp(10px, 2vw, 12px);
-            color: #94a3b8;
-            background: #f1f5f9;
-            padding: 2px 8px;
-            border-radius: 20px;
-            white-space: nowrap;
+            font-size: clamp(10px, 2vw, 12px); color: #94a3b8;
+            background: #f1f5f9; padding: 2px 8px; border-radius: 20px; white-space: nowrap;
         }
 
-        /* ===== 底部按钮 ===== */
         .footer-actions {
-            margin-top: 20px;
-            padding-top: 16px;
-            border-top: 2px solid #e2e8f0;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            justify-content: flex-end;
+            margin-top: 20px; padding-top: 16px; border-top: 2px solid #e2e8f0;
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: flex-end;
         }
         .footer-actions .btn {
-            padding: 10px 20px;
-            font-size: clamp(13px, 3vw, 15px);
-            min-height: 44px;
-            flex: 1 1 auto;
-            max-width: 100%;
+            padding: 10px 20px; font-size: clamp(13px, 3vw, 15px);
+            min-height: 44px; flex: 1 1 auto; max-width: 100%;
         }
 
         .empty-state {
-            padding: 30px 16px;
-            text-align: center;
-            color: #94a3b8;
-            font-size: clamp(14px, 3vw, 16px);
-            border: 2px dashed #e2e8f0;
-            border-radius: 14px;
-            margin-bottom: 16px;
+            padding: 30px 16px; text-align: center; color: #94a3b8;
+            font-size: clamp(14px, 3vw, 16px); border: 2px dashed #e2e8f0;
+            border-radius: 14px; margin-bottom: 16px;
         }
         .empty-state .btn { margin-top: 10px; }
 
         .toast {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
+            position: fixed; bottom: 20px; left: 50%;
             transform: translateX(-50%) translateY(80px);
-            background: #0f172a;
-            color: #f8fafc;
-            padding: 10px 22px;
-            border-radius: 40px;
-            font-size: clamp(13px, 2.8vw, 15px);
-            font-weight: 500;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
-            opacity: 0;
-            transition: all 0.4s ease;
-            z-index: 999;
-            pointer-events: none;
-            max-width: 90vw;
-            text-align: center;
+            background: #0f172a; color: #f8fafc; padding: 10px 22px;
+            border-radius: 40px; font-size: clamp(13px, 2.8vw, 15px);
+            font-weight: 500; box-shadow: 0 8px 30px rgba(0,0,0,0.25);
+            opacity: 0; transition: all 0.4s ease; z-index: 999;
+            pointer-events: none; max-width: 90vw; text-align: center;
         }
-        .toast.show {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
+        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
         .toast.success { background: #16a34a; }
         .toast.error { background: #dc2626; }
         .toast.warning { background: #f59e0b; }
 
         .ratio-badge {
-            display: inline-block;
-            background: #dbeafe;
-            color: #1d4ed8;
-            padding: 2px 12px;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: clamp(12px, 2.6vw, 14px);
-            margin-left: 2px;
+            display: inline-block; background: #dbeafe; color: #1d4ed8;
+            padding: 2px 12px; border-radius: 30px; font-weight: 600;
+            font-size: clamp(12px, 2.6vw, 14px); margin-left: 2px;
         }
 
         .modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
+            display: none; position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%; background: rgba(0,0,0,0.4);
+            z-index: 1000; justify-content: center; align-items: center; padding: 16px;
         }
         .modal-overlay.active { display: flex; }
         .modal-box {
-            background: #ffffff;
-            padding: 24px 20px;
-            border-radius: 16px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
-            max-height: 90vh;
-            overflow-y: auto;
+            background: #ffffff; padding: 24px 20px; border-radius: 16px;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+            max-height: 90vh; overflow-y: auto;
         }
-        .modal-box h3 {
-            margin-bottom: 14px;
-            font-size: clamp(18px, 4.5vw, 22px);
-            font-weight: 700;
-            color: #0f172a;
-        }
+        .modal-box h3 { margin-bottom: 14px; font-size: clamp(18px, 4.5vw, 22px); font-weight: 700; color: #0f172a; }
         .modal-box .field-group { margin-bottom: 12px; }
         .modal-box .field-group label {
-            display: block;
-            font-weight: 600;
-            font-size: clamp(13px, 2.8vw, 15px);
-            color: #334155;
-            margin-bottom: 4px;
+            display: block; font-weight: 600;
+            font-size: clamp(13px, 2.8vw, 15px); color: #334155; margin-bottom: 4px;
         }
         .modal-box .field-group input[type="text"] {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1.5px solid #cbd5e1;
-            border-radius: 8px;
-            font-size: clamp(14px, 3vw, 16px);
-            transition: border-color 0.2s;
+            width: 100%; padding: 8px 12px; border: 1.5px solid #cbd5e1;
+            border-radius: 8px; font-size: clamp(14px, 3vw, 16px); transition: border-color 0.2s;
         }
         .modal-box .field-group input[type="text"]:focus {
-            border-color: #2563eb;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+            border-color: #2563eb; outline: none;
+            box-shadow: 0 0 0 3px rgba(37,99,235,0.12);
         }
-        .modal-box .modal-actions {
-            display: flex;
-            gap: 10px;
-            justify-content: flex-end;
-            margin-top: 16px;
-        }
-        .modal-box .modal-actions .btn {
-            min-height: 40px;
-            padding: 8px 20px;
-            flex: 1 1 auto;
-        }
+        .modal-box .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 16px; }
+        .modal-box .modal-actions .btn { min-height: 40px; padding: 8px 20px; flex: 1 1 auto; }
 
-        /* 响应式 */
         @media (max-width: 768px) {
             body { padding: 8px; }
             .app-container { padding: 12px; }
@@ -900,8 +389,8 @@
             .dish-header { padding: 6px 10px; }
             .items-table { min-width: 400px; font-size: clamp(11px, 2.4vw, 13px); }
             .items-table th { font-size: clamp(10px, 2.2vw, 12px); padding: 4px 3px; }
-            .items-table td { padding: 3px 3px; }
-            .items-table .col-num input { width: 48px; font-size: clamp(11px, 2.4vw, 13px); padding: 2px 2px; }
+            .items-table td { padding: 3px; }
+            .items-table .col-num input { width: 48px; font-size: clamp(11px, 2.4vw, 13px); padding: 2px; }
             .items-table .col-num .auto-value { font-size: clamp(11px, 2.4vw, 13px); min-width: 30px; }
             .items-table .col-name input { font-size: clamp(11px, 2.4vw, 13px); padding: 2px 3px; }
             .items-table .col-note input { font-size: clamp(10px, 2.2vw, 12px); padding: 2px 3px; }
@@ -928,22 +417,21 @@
             .header h1 small { font-size: clamp(12px, 3vw, 15px); }
             .header-info { font-size: clamp(10px, 2.4vw, 12px); padding: 4px 8px; gap: 2px 10px; border-radius: 30px; }
             .toolbar { padding: 8px 10px; gap: 8px; }
-            .toolbar .ratio-group input { width: 42px; font-size: clamp(13px, 3vw, 15px); min-height: 32px; padding: 2px 2px; }
+            .toolbar .ratio-group input { width: 42px; font-size: clamp(13px, 3vw, 15px); min-height: 32px; padding: 2px; }
             .btn { padding: 5px 12px; font-size: clamp(10px, 2.4vw, 12px); min-height: 32px; }
             .day-header { padding: 6px 10px; font-size: clamp(13px, 3.2vw, 15px); }
             .dish-header { padding: 5px 8px; }
             .dish-header .dish-name { font-size: clamp(12px, 2.8vw, 14px); }
-            .past-raw-select { max-width: 110px; font-size: 10px; }
             .items-table { min-width: 320px; font-size: clamp(10px, 2.2vw, 12px); }
             .items-table th { font-size: clamp(9px, 2vw, 11px); padding: 3px 2px; }
-            .items-table td { padding: 2px 2px; }
+            .items-table td { padding: 2px; }
             .items-table .col-num input { width: 40px; font-size: clamp(10px, 2.2vw, 12px); padding: 1px 2px; }
             .items-table .col-num .auto-value { font-size: clamp(10px, 2.2vw, 12px); min-width: 26px; padding: 1px 2px; }
             .items-table .col-name input { font-size: clamp(10px, 2.2vw, 12px); padding: 1px 2px; min-width: 40px; }
             .items-table .col-note input { font-size: clamp(9px, 2vw, 11px); padding: 1px 2px; min-width: 40px; }
             .items-table .col-idx { font-size: clamp(9px, 2vw, 11px); width: 20px; }
             .items-table .col-action { width: 26px; }
-            .items-table .col-action .btn { font-size: clamp(9px, 2vw, 11px); min-height: 20px; padding: 0px 3px; }
+            .items-table .col-action .btn { font-size: clamp(9px, 2vw, 11px); min-height: 20px; padding: 0 3px; }
             .add-row-btn { font-size: clamp(9px, 2vw, 11px); padding: 2px 10px; min-height: 26px; margin: 2px 0 4px 6px; }
             .sample-table { min-width: 280px; font-size: clamp(9px, 2vw, 11px); }
             .sample-table th, .sample-table td { padding: 2px 3px; }
@@ -963,7 +451,7 @@
             .header-info { padding: 10px 24px; }
             .toolbar { padding: 16px 24px; }
             .items-table { font-size: 15px; }
-            .items-table th { font-size: 14px; padding: 10px 10px; }
+            .items-table th { font-size: 14px; padding: 10px; }
             .items-table td { padding: 8px 10px; }
             .items-table .col-num input { width: 80px; font-size: 15px; }
             .day-header { padding: 14px 24px; font-size: 20px; }
@@ -972,7 +460,6 @@
 </head>
 <body>
     <div class="app-container" id="app">
-        <!-- 头部 -->
         <div class="header">
             <h1 id="mainTitle">
                 尚湖初中
@@ -988,7 +475,6 @@
             </div>
         </div>
 
-        <!-- 工具栏 -->
         <div class="toolbar">
             <div class="ratio-group">
                 <label>📊 分配比例</label>
@@ -1007,7 +493,6 @@
             </div>
         </div>
 
-        <!-- 示例数据区域（只读） -->
         <div class="sample-section" id="sampleSection">
             <div class="sample-title">
                 📋 示例数据（仅供参考，不参与智能体运算）
@@ -1016,7 +501,6 @@
             <div class="sample-table-wrap" id="sampleTableWrap"></div>
         </div>
 
-        <!-- 智能体表格区域 -->
         <div style="margin-top: 16px; border-top: 2px dashed #d1d9e6; padding-top: 16px;">
             <div class="agent-header">
                 <h2>🧠 智能体表格 (可编辑)</h2>
@@ -1025,7 +509,6 @@
             <div id="daysContainer"></div>
         </div>
 
-        <!-- 草稿箱区域 -->
         <div class="draft-section" id="draftSection">
             <div class="draft-header">
                 <h3>📦 草稿箱</h3>
@@ -1038,7 +521,6 @@
             <div id="draftListContainer" class="draft-list"></div>
         </div>
 
-        <!-- 底部 -->
         <div class="footer-actions">
             <button class="btn btn-primary" id="addDayBtn">➕ 添加新的一天</button>
             <button class="btn btn-success" id="exportBtn2">📥 导出 .xlsx</button>
@@ -1046,7 +528,6 @@
         </div>
     </div>
 
-    <!-- 模态框：日期/菜品/原材料名称编辑 -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal-box">
             <h3 id="modalTitle">输入</h3>
@@ -1058,7 +539,6 @@
         </div>
     </div>
 
-    <!-- 模态框：往期菜品选择（按天添加整道菜品） -->
     <div class="modal-overlay" id="pastDishModalOverlay">
         <div class="modal-box" style="max-width:600px;">
             <h3>📋 选择往期菜品</h3>
@@ -1070,11 +550,11 @@
         </div>
     </div>
 
-    <!-- 模态框：往期原材料选择（添加到当前菜品） -->
     <div class="modal-overlay" id="pastRawModalOverlay">
         <div class="modal-box" style="max-width:600px;">
             <h3>📋 选择往期原材料</h3>
-            <input type="text" id="pastRawSearchInput" placeholder="🔍 搜索原材料名称..." style="width:100%;padding:8px 12px;border:1.5px solid #cbd5e1;border-radius:8px;margin-bottom:10px;font-size:14px;">
+            <div id="pastRawDishHint" style="background:#e0f2fe;color:#0c4a6e;padding:6px 10px;border-radius:6px;margin-bottom:8px;font-size:13px;font-weight:500;"></div>
+            <input type="text" id="pastRawSearchInput" placeholder="🔍 搜索原材料..." style="width:100%;padding:8px 12px;border:1.5px solid #cbd5e1;border-radius:8px;margin-bottom:10px;font-size:14px;">
             <div id="pastRawSelectList" style="max-height:400px;overflow-y:auto;padding-right:4px;"></div>
             <div class="modal-actions">
                 <button class="btn btn-outline" id="pastRawCancel">取消</button>
@@ -1082,7 +562,6 @@
         </div>
     </div>
 
-    <!-- 模态框：往期数据查看（菜品+原材料） -->
     <div class="modal-overlay" id="pastHistoryModalOverlay">
         <div class="modal-box" style="max-width:780px;">
             <h3>📚 往期数据</h3>
@@ -1120,13 +599,7 @@
                     { name: '丝瓜', total: 20, note: '' }, { name: '西红柿', total: 25, note: '' },
                     { name: '青菜', total: 60, note: '' }, { name: '鸡蛋', total: 20, note: '' },
                     { name: '年糕', total: 130, note: '' }, { name: '豆腐', total: 25, note: '' },
-                    { name: '烧麦', total: 410, note: '个' }, { name: '蚝油', total: 12, note: '' },
-                    { name: '面粉', total: 100, note: '' }, { name: '大米', total: 1000, note: '' },
-                    { name: '油', total: 16, note: '' }, { name: '料酒', total: 40, note: '' },
-                    { name: '香醋', total: 12, note: '' }, { name: '老抽', total: 6, note: '' },
-                    { name: '盐', total: 60, note: '' }, { name: '美味鲜', total: 6, note: '' },
-                    { name: '小葱', total: 2, note: '' }, { name: '生姜', total: 1, note: '' },
-                    { name: '大蒜', total: 1, note: '' }, { name: '乌江榨菜', total: 1, note: '箱' }
+                    { name: '烧麦', total: 410, note: '个' }, { name: '蚝油', total: 12, note: '' }
                 ]
             }, {
                 name: '周二',
@@ -1134,43 +607,26 @@
                     { name: '梅干菜', total: 11, note: '' }, { name: '前腿肉', total: 196, note: '' },
                     { name: '脆山药', total: 56, note: '' }, { name: '干木耳', total: 3, note: '' },
                     { name: '紫菜', total: 1, note: '' }, { name: '鸡蛋', total: 21, note: '' },
-                    { name: '整只鸭', total: 100, note: '' }, { name: '藕', total: 110, note: '' },
-                    { name: '金针菇', total: 16, note: '' }, { name: '豆腐', total: 15, note: '' },
-                    { name: '黑糯米糕', total: 880, note: '个' }, { name: '馄饨皮', total: 50, note: '今早吃' },
-                    { name: '大黄豆', total: 18, note: '' }, { name: '小葱', total: 1, note: '' },
-                    { name: '生姜', total: 1, note: '' }, { name: '大蒜', total: 1, note: '' }
+                    { name: '整只鸭', total: 100, note: '' }, { name: '藕', total: 110, note: '' }
                 ]
             }, {
                 name: '周三',
                 items: [
                     { name: '前腿肉', total: 117, note: '' }, { name: '胡萝卜', total: 28, note: '' },
                     { name: '青圆椒', total: 21, note: '' }, { name: '洋葱', total: 7, note: '' },
-                    { name: '玉米粒', total: 112, note: '' }, { name: '青豆', total: 35, note: '' },
-                    { name: '西红柿', total: 28, note: '' }, { name: '鸡蛋', total: 91, note: '' },
-                    { name: '球菜', total: 60, note: '' }, { name: '粉干', total: 70, note: '' },
-                    { name: '冬瓜', total: 24, note: '' }, { name: '虾皮', total: 1, note: '' },
-                    { name: '豆腐', total: 40, note: '' }, { name: '咸菜', total: 50, note: '' },
-                    { name: '玉米粉', total: 30, note: '' }, { name: '小葱', total: 1, note: '' },
-                    { name: '生姜', total: 1, note: '' }, { name: '大蒜', total: 1, note: '' }
+                    { name: '玉米粒', total: 112, note: '' }, { name: '青豆', total: 35, note: '' }
                 ]
             }, {
                 name: '周四',
                 items: [
                     { name: '大排', total: 700, note: '片' }, { name: '球菜', total: 112, note: '' },
-                    { name: '干番薯粉丝', total: 21, note: '' }, { name: '平菇', total: 20, note: '' },
-                    { name: '豆腐', total: 73, note: '' }, { name: '中翅', total: 1220, note: '只' },
-                    { name: '青菜', total: 90, note: '' }, { name: '榨菜', total: 50, note: '' },
-                    { name: '鸡蛋', total: 12, note: '' }, { name: '粽子', total: 406, note: '今早吃' },
-                    { name: '前腿肉', total: 25, note: '' }, { name: '韭菜', total: 3, note: '' },
-                    { name: '老南瓜', total: 50, note: '' }, { name: '小葱', total: 1, note: '' },
-                    { name: '生姜', total: 1, note: '' }, { name: '大蒜', total: 1, note: '' }
+                    { name: '干番薯粉丝', total: 21, note: '' }, { name: '平菇', total: 20, note: '' }
                 ]
             }, {
                 name: '周五',
                 items: [
                     { name: '明虾', total: 130, note: '' }, { name: '香菇', total: 24, note: '' },
-                    { name: '青菜', total: 120, note: '' }, { name: '金针菇', total: 20, note: '' },
-                    { name: '豆腐', total: 28, note: '' }
+                    { name: '青菜', total: 120, note: '' }
                 ]
             }]
         };
@@ -1178,20 +634,21 @@
         // ================================================================
         // 2. 存储 Key 与全局变量
         // ================================================================
-        const STORAGE_KEY = 'foodOrderData_v26';
+        const STORAGE_KEY = 'foodOrderData_v27';
         const DRAFTS_KEY = 'foodOrderDrafts_v1';
-        const DISHES_KEY = 'foodOrderPastDishes_v3';
-        const RAW_KEY = 'foodOrderPastRaw_v1';
+        const DISHES_KEY = 'foodOrderPastDishes_v4';
+        const RAW_KEY = 'foodOrderPastRaw_v2'; // 新格式：键为 菜品名::原材料名
 
         let appData = null;
         let saveTimeout = null;
         let drafts = [];
         let autoSaveInterval = null;
-        let pastDishes = {};        // 往期菜品（含原材料）
-        let pastRawMaterials = {};  // 往期单个原材料
-        let currentPastDishTarget = null;   // { dayIdx } 用于往期菜品
-        let currentPastRawTarget = null;    // { dayIdx, dishIdx } 用于往期原材料
-        let historyCurrentTab = 'dish';     // 'dish' | 'raw'
+        let pastDishes = {};
+        let pastRawMaterials = {}; // { "菜品名::原材料名": { name, dishName, lastTotal, ... } }
+        let currentPastDishTarget = null;
+        let currentPastRawTarget = null;
+        let currentPastRawDishName = '';
+        let historyCurrentTab = 'dish';
 
         // ================================================================
         // 3. 数据加载
@@ -1211,9 +668,7 @@
                         if (day.items && Array.isArray(day.items) && !day.dishes) {
                             day.dishes = [{ name: '菜品1', items: day.items }];
                             delete day.items;
-                        } else if (!day.dishes) {
-                            day.dishes = [];
-                        }
+                        } else if (!day.dishes) { day.dishes = []; }
                         day.dishes.forEach(dish => {
                             if (!dish.items) dish.items = [];
                             dish.items.forEach(item => {
@@ -1272,8 +727,33 @@
             const stored = localStorage.getItem(RAW_KEY);
             if (stored) {
                 try {
-                    pastRawMaterials = JSON.parse(stored);
-                    if (!pastRawMaterials || typeof pastRawMaterials !== 'object') pastRawMaterials = {};
+                    const parsed = JSON.parse(stored);
+                    if (!parsed || typeof parsed !== 'object') { pastRawMaterials = {}; return; }
+                    const keys = Object.keys(parsed);
+                    // 检查是否为新格式（键中包含 ::）
+                    const hasNewFormat = keys.some(k => k.includes('::'));
+                    if (hasNewFormat || keys.length === 0) {
+                        pastRawMaterials = parsed;
+                    } else {
+                        // 旧格式迁移：将旧数据重新分配为"未知菜品"
+                        const migrated = {};
+                        keys.forEach(k => {
+                            const old = parsed[k];
+                            if (old && old.name) {
+                                const newKey = `未知菜品::${old.name}`;
+                                migrated[newKey] = {
+                                    name: old.name,
+                                    dishName: '未知菜品',
+                                    lastTotal: old.lastTotal || 0,
+                                    lastNote: old.lastNote || '',
+                                    lastUsed: old.lastUsed || Date.now(),
+                                    history: old.history || []
+                                };
+                            }
+                        });
+                        pastRawMaterials = migrated;
+                        savePastRawMaterials();
+                    }
                 } catch (e) { pastRawMaterials = {}; }
             } else { pastRawMaterials = {}; }
         }
@@ -1288,9 +768,6 @@
             catch (e) { console.warn('保存往期原材料失败', e); }
         }
 
-        /**
-         * 记录菜品快照（包含所有原材料）
-         */
         function recordDishSnapshot(dayIdx, dishIdx) {
             const day = appData.days[dayIdx];
             if (!day) return;
@@ -1331,18 +808,23 @@
         }
 
         /**
-         * 记录单个原材料到 pastRawMaterials
+         * 记录单个原材料，键为 菜品名::原材料名，实现按菜品独立存储
          */
-        function recordRawMaterial(name, total, note) {
-            if (!name || !name.trim()) return;
-            const key = name.trim();
-            if (key === '未命名') return;
+        function recordRawMaterial(dishName, rawName, total, note) {
+            if (!dishName || !dishName.trim() || dishName === '未命名') return;
+            if (!rawName || !rawName.trim()) return;
+            const rawTrim = rawName.trim();
+            const dishTrim = dishName.trim();
+            if (rawTrim === '未命名') return;
+
+            const key = `${dishTrim}::${rawTrim}`;
             const t = parseFloat(total) || 0;
             const n = note || '';
 
             if (!pastRawMaterials[key]) {
                 pastRawMaterials[key] = {
-                    name: key,
+                    name: rawTrim,
+                    dishName: dishTrim,
                     lastTotal: t,
                     lastNote: n,
                     lastUsed: Date.now(),
@@ -1367,22 +849,39 @@
             const dish = day.dishes[dishIdx];
             if (!dish) return;
             clearTimeout(dish._recordTimer);
-            dish._recordTimer = setTimeout(() => {
-                recordDishSnapshot(dayIdx, dishIdx);
-            }, 900);
+            dish._recordTimer = setTimeout(() => { recordDishSnapshot(dayIdx, dishIdx); }, 900);
         }
 
-        function scheduleRecordRaw(item) {
-            if (!item) return;
+        function scheduleRecordRaw(dishName, item) {
+            if (!item || !dishName) return;
             clearTimeout(item._rawTimer);
             item._rawTimer = setTimeout(() => {
                 if (item.name && item.name !== '未命名') {
-                    recordRawMaterial(item.name, item.total, item.note);
+                    recordRawMaterial(dishName, item.name, item.total, item.note);
                 }
             }, 800);
         }
 
-        // ---- 往期菜品选择（按天添加整道菜品） ----
+        /**
+         * 当菜品重命名时，迁移该菜品下的所有原材料记录
+         */
+        function migrateRawMaterialsOnDishRename(oldName, newName) {
+            if (!oldName || !newName || oldName === newName) return;
+            const keysToMigrate = Object.keys(pastRawMaterials).filter(k => {
+                const rec = pastRawMaterials[k];
+                return rec && rec.dishName === oldName;
+            });
+            if (keysToMigrate.length === 0) return;
+            keysToMigrate.forEach(oldKey => {
+                const rec = pastRawMaterials[oldKey];
+                const newKey = `${newName}::${rec.name}`;
+                pastRawMaterials[newKey] = { ...rec, dishName: newName, lastUsed: Date.now() };
+                delete pastRawMaterials[oldKey];
+            });
+            savePastRawMaterials();
+        }
+
+        // ---- 往期菜品选择 ----
         function openPastDishSelect(dayIdx) {
             currentPastDishTarget = { dayIdx };
             const input = document.getElementById('pastDishSearchInput');
@@ -1454,11 +953,19 @@
             showToast(`已添加往期菜品：${dishName}（含 ${newDish.items.length} 项原材料）`, 'success');
         }
 
-        // ---- 往期原材料选择（添加到当前菜品） ----
+        // ---- 往期原材料选择（按当前菜品过滤） ----
         function openPastRawSelect(dayIdx, dishIdx) {
+            const day = appData.days[dayIdx];
+            if (!day) return;
+            const dish = day.dishes[dishIdx];
+            if (!dish) return;
             currentPastRawTarget = { dayIdx, dishIdx };
+            currentPastRawDishName = dish.name || '未命名菜品';
             const input = document.getElementById('pastRawSearchInput');
             if (input) input.value = '';
+            // 提示当前菜品
+            const hint = document.getElementById('pastRawDishHint');
+            if (hint) hint.textContent = `当前菜品：${currentPastRawDishName}`;
             renderPastRawSelectList('');
             document.getElementById('pastRawModalOverlay').classList.add('active');
         }
@@ -1466,24 +973,35 @@
         function renderPastRawSelectList(searchTerm) {
             const container = document.getElementById('pastRawSelectList');
             if (!container) return;
-            const keys = Object.keys(pastRawMaterials);
-            const filtered = searchTerm
-                ? keys.filter(k => k.toLowerCase().includes(searchTerm.toLowerCase()))
-                : keys;
-            filtered.sort((a, b) => (pastRawMaterials[b].lastUsed || 0) - (pastRawMaterials[a].lastUsed || 0));
+            const dishName = currentPastRawDishName;
 
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">暂无往期原材料记录<br><span style="font-size:12px;">在菜品中输入原材料后会自动记录</span></div>';
+            // 仅显示属于当前菜品的原材料记录（按 菜品名:: 前缀过滤）
+            const filteredKeys = Object.keys(pastRawMaterials).filter(k => {
+                const rec = pastRawMaterials[k];
+                return rec && rec.dishName === dishName;
+            });
+
+            const searched = searchTerm
+                ? filteredKeys.filter(k => {
+                    const rec = pastRawMaterials[k];
+                    return rec.name.toLowerCase().includes(searchTerm.toLowerCase());
+                })
+                : filteredKeys;
+
+            searched.sort((a, b) => (pastRawMaterials[b].lastUsed || 0) - (pastRawMaterials[a].lastUsed || 0));
+
+            if (searched.length === 0) {
+                container.innerHTML = `<div style="text-align:center;color:#94a3b8;padding:30px 10px;">菜品 "${escapeHtml(dishName)}" 暂无往期原材料记录<br><span style="font-size:12px;">在该菜品下录入原材料后会自动记录</span></div>`;
                 return;
             }
 
             let html = '';
-            filtered.forEach(key => {
-                const d = pastRawMaterials[key];
+            searched.forEach(k => {
+                const d = pastRawMaterials[k];
                 html += `
-                    <div class="raw-material-item" data-name="${escapeHtml(key)}">
+                    <div class="raw-material-item" data-key="${escapeHtml(k)}">
                         <div style="flex:1;min-width:0;">
-                            <div class="raw-name">${escapeHtml(key)}</div>
+                            <div class="raw-name">${escapeHtml(d.name)}</div>
                             <div class="raw-meta">最近：合计 ${d.lastTotal}${d.lastNote ? ' · 备注：' + escapeHtml(d.lastNote) : ''}</div>
                         </div>
                         <div class="raw-count">${d.history.length} 条</div>
@@ -1494,15 +1012,15 @@
 
             container.querySelectorAll('.raw-material-item').forEach(el => {
                 el.onclick = function() {
-                    const name = this.dataset.name;
-                    addPastRawToDish(currentPastRawTarget.dayIdx, currentPastRawTarget.dishIdx, name);
+                    const key = this.dataset.key;
+                    addPastRawToDish(currentPastRawTarget.dayIdx, currentPastRawTarget.dishIdx, key);
                     document.getElementById('pastRawModalOverlay').classList.remove('active');
                 };
             });
         }
 
-        function addPastRawToDish(dayIdx, dishIdx, rawName) {
-            const raw = pastRawMaterials[rawName];
+        function addPastRawToDish(dayIdx, dishIdx, key) {
+            const raw = pastRawMaterials[key];
             if (!raw) return;
             const day = appData.days[dayIdx];
             if (!day) return;
@@ -1519,14 +1037,13 @@
             saveAppData();
             renderApp();
             scheduleRecordDishSnapshot(dayIdx, dishIdx);
-            showToast(`已添加往期原材料：${rawName}`, 'success');
+            showToast(`已添加往期原材料：${raw.name}`, 'success');
         }
 
-        // ---- 往期数据查看（含菜品和原材料两个 Tab） ----
+        // ---- 往期数据查看 ----
         function openPastHistoryModal() {
             const overlay = document.getElementById('pastHistoryModalOverlay');
             document.getElementById('pastHistorySearchInput').value = '';
-            // 默认为菜品 Tab
             historyCurrentTab = 'dish';
             document.querySelectorAll('.tab-btn').forEach(b => {
                 if (b.dataset.tab === 'dish') {
@@ -1548,44 +1065,50 @@
 
         function updatePastHistoryFilter() {
             const filterSelect = document.getElementById('pastHistoryFilterSelect');
-            const source = historyCurrentTab === 'dish' ? pastDishes : pastRawMaterials;
-            const keys = Object.keys(source).sort();
-            filterSelect.innerHTML = '<option value="">全部</option>' +
-                keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+            if (historyCurrentTab === 'dish') {
+                const keys = Object.keys(pastDishes).sort();
+                filterSelect.innerHTML = '<option value="">全部菜品</option>' +
+                    keys.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+            } else {
+                // 原材料：按菜品名筛选
+                const dishNames = [...new Set(
+                    Object.values(pastRawMaterials)
+                        .filter(r => r && r.dishName)
+                        .map(r => r.dishName)
+                )].sort();
+                filterSelect.innerHTML = '<option value="">全部菜品</option>' +
+                    dishNames.map(k => `<option value="${escapeHtml(k)}">${escapeHtml(k)}</option>`).join('');
+            }
             filterSelect.value = '';
         }
 
         function renderPastHistoryContent(searchTerm, filterName) {
             const container = document.getElementById('pastHistoryContent');
-            const source = historyCurrentTab === 'dish' ? pastDishes : pastRawMaterials;
-            const keys = Object.keys(source);
 
-            if (keys.length === 0) {
-                container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">暂无往期记录</div>';
-                return;
-            }
-
-            let filtered = keys.filter(k => {
-                const matchSearch = !searchTerm || k.toLowerCase().includes(searchTerm.toLowerCase());
-                const matchFilter = !filterName || k === filterName;
-                return matchSearch && matchFilter;
-            });
-
-            filtered.sort((a, b) => (source[b].lastUsed || 0) - (source[a].lastUsed || 0));
-
-            if (filtered.length === 0) {
-                container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">未找到匹配的记录</div>';
-                return;
-            }
-
-            let html = '';
             if (historyCurrentTab === 'dish') {
-                // 菜品卡片
+                // === 往期菜品视图 ===
+                const keys = Object.keys(pastDishes);
+                if (keys.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">暂无往期菜品记录</div>';
+                    return;
+                }
+                let filtered = keys.filter(k => {
+                    const matchSearch = !searchTerm || k.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchFilter = !filterName || k === filterName;
+                    return matchSearch && matchFilter;
+                });
+                filtered.sort((a, b) => (pastDishes[b].lastUsed || 0) - (pastDishes[a].lastUsed || 0));
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">未找到匹配的菜品</div>';
+                    return;
+                }
+
+                let html = '';
                 filtered.forEach(key => {
-                    const d = source[key];
+                    const d = pastDishes[key];
                     const lastItems = d.lastItems || [];
                     const lastItemsHtml = lastItems.map(i => `<span class="item-tag">${escapeHtml(i.name)} · ${i.total}${i.note ? '（' + escapeHtml(i.note) + '）' : ''}</span>`).join('');
-
                     html += `
                         <div class="dish-card">
                             <div class="dish-card-header">
@@ -1610,14 +1133,39 @@
                         </div>
                     `;
                 });
+                container.innerHTML = html;
             } else {
-                // 原材料卡片
-                filtered.forEach(key => {
-                    const d = source[key];
+                // === 往期原材料视图（按菜品独立展示） ===
+                const keys = Object.keys(pastRawMaterials);
+                if (keys.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">暂无往期原材料记录</div>';
+                    return;
+                }
+
+                let filtered = keys.filter(k => {
+                    const rec = pastRawMaterials[k];
+                    if (!rec) return false;
+                    const matchSearch = !searchTerm ||
+                        rec.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                        rec.dishName.toLowerCase().includes(searchTerm.toLowerCase());
+                    const matchFilter = !filterName || rec.dishName === filterName;
+                    return matchSearch && matchFilter;
+                });
+
+                filtered.sort((a, b) => (pastRawMaterials[b].lastUsed || 0) - (pastRawMaterials[a].lastUsed || 0));
+
+                if (filtered.length === 0) {
+                    container.innerHTML = '<div style="text-align:center;color:#94a3b8;padding:30px 10px;">未找到匹配的原材料</div>';
+                    return;
+                }
+
+                let html = '';
+                filtered.forEach(k => {
+                    const d = pastRawMaterials[k];
                     html += `
                         <div class="dish-card">
                             <div class="dish-card-header">
-                                <div class="dish-card-title">${escapeHtml(key)}</div>
+                                <div class="dish-card-title">${escapeHtml(d.name)}<span class="belong-dish">属于：${escapeHtml(d.dishName)}</span></div>
                                 <div class="dish-card-meta">最近使用：${formatTimestamp(d.lastUsed)}</div>
                             </div>
                             <div class="dish-card-latest">
@@ -1638,8 +1186,8 @@
                         </div>
                     `;
                 });
+                container.innerHTML = html;
             }
-            container.innerHTML = html;
         }
 
         // ================================================================
@@ -1936,7 +1484,6 @@
                 const dayActions = document.createElement('div');
                 dayActions.className = 'day-actions';
 
-                // 保留：往期菜品（整道菜品的下拉选择）
                 let pastDishHtml = '';
                 if (hasPastDishes) {
                     pastDishHtml = `<button class="btn btn-info btn-sm add-past-dish-btn" data-dayidx="${dayIdx}">📋 往期菜品</button>`;
@@ -1973,12 +1520,16 @@
                         dishNameSpan.title = '双击编辑菜品名称';
                         dishNameSpan.addEventListener('dblclick', function(e) {
                             e.stopPropagation();
+                            const oldName = appData.days[dayIdx].dishes[dishIdx].name;
                             showModal({
                                 title: '编辑菜品名称', mode: 'text',
                                 defaults: dish.name, label: '菜品名称'
                             }).then(newName => {
                                 if (newName && newName.trim()) {
-                                    appData.days[dayIdx].dishes[dishIdx].name = newName.trim();
+                                    const trimmed = newName.trim();
+                                    appData.days[dayIdx].dishes[dishIdx].name = trimmed;
+                                    // 迁移该菜品下的往期原材料记录
+                                    migrateRawMaterialsOnDishRename(oldName, trimmed);
                                     saveAppData();
                                     renderApp();
                                     scheduleRecordDishSnapshot(dayIdx, dishIdx);
@@ -1990,7 +1541,6 @@
                         const dishActions = document.createElement('div');
                         dishActions.className = 'dish-actions';
 
-                        // 新增：往期原材料下拉框（位于智能体表格区域内）
                         let pastRawHtml = '';
                         if (hasPastRaw) {
                             pastRawHtml = `<button class="btn btn-info btn-sm add-past-raw-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}" style="background:#0ea5e9;">📋 往期原材料</button>`;
@@ -2105,7 +1655,7 @@
                 };
             });
 
-            // 往期菜品（按天添加整道菜品）
+            // 往期菜品
             container.querySelectorAll('.add-past-dish-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -2115,7 +1665,7 @@
                 };
             });
 
-            // 往期原材料（添加到当前菜品）
+            // 往期原材料
             container.querySelectorAll('.add-past-raw-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -2160,7 +1710,7 @@
                             dish.items.push({ name: name.trim(), total: 0, note: '' });
                             saveAppData();
                             renderApp();
-                            scheduleRecordRaw(dish.items[dish.items.length - 1]);
+                            scheduleRecordRaw(dish.name, dish.items[dish.items.length - 1]);
                             scheduleRecordDishSnapshot(dayIdx, dishIdx);
                             showToast(`已添加原材料：${name.trim()}`, 'success');
                         } else if (name !== null && name.trim() === '') {
@@ -2170,7 +1720,7 @@
                 };
             });
 
-            // 添加原材料（表格下方按钮）
+            // 添加原材料（表格下方）
             container.querySelectorAll('.add-row-btn').forEach(btn => {
                 btn.onclick = function(e) {
                     e.stopPropagation();
@@ -2187,7 +1737,7 @@
                             dish.items.push({ name: name.trim(), total: 0, note: '' });
                             saveAppData();
                             renderApp();
-                            scheduleRecordRaw(dish.items[dish.items.length - 1]);
+                            scheduleRecordRaw(dish.name, dish.items[dish.items.length - 1]);
                             scheduleRecordDishSnapshot(dayIdx, dishIdx);
                             showToast(`已添加原材料：${name.trim()}`, 'success');
                         }
@@ -2204,7 +1754,9 @@
                     const dishIdx = parseInt(tr.dataset.dishIdx);
                     const itemIdx = parseInt(tr.dataset.itemIdx);
                     if (isNaN(dayIdx) || isNaN(dishIdx) || isNaN(itemIdx)) return;
-                    const item = appData.days[dayIdx].dishes[dishIdx].items[itemIdx];
+                    const dish = appData.days[dayIdx].dishes[dishIdx];
+                    if (!dish) return;
+                    const item = dish.items[itemIdx];
                     if (!item) return;
                     const val = parseFloat(this.value);
                     const total = isNaN(val) ? 0 : val;
@@ -2215,7 +1767,7 @@
                     if (s) s.textContent = student;
                     if (t) t.textContent = teacher;
                     saveAppData();
-                    scheduleRecordRaw(item);
+                    scheduleRecordRaw(dish.name, item);
                     scheduleRecordDishSnapshot(dayIdx, dishIdx);
                 };
             });
@@ -2229,11 +1781,13 @@
                     const dishIdx = parseInt(tr.dataset.dishIdx);
                     const itemIdx = parseInt(tr.dataset.itemIdx);
                     if (isNaN(dayIdx) || isNaN(dishIdx) || isNaN(itemIdx)) return;
-                    const item = appData.days[dayIdx].dishes[dishIdx].items[itemIdx];
+                    const dish = appData.days[dayIdx].dishes[dishIdx];
+                    if (!dish) return;
+                    const item = dish.items[itemIdx];
                     if (!item) return;
                     item.name = this.value.trim() || '未命名';
                     saveAppData();
-                    scheduleRecordRaw(item);
+                    scheduleRecordRaw(dish.name, item);
                     scheduleRecordDishSnapshot(dayIdx, dishIdx);
                 };
             });
@@ -2247,11 +1801,13 @@
                     const dishIdx = parseInt(tr.dataset.dishIdx);
                     const itemIdx = parseInt(tr.dataset.itemIdx);
                     if (isNaN(dayIdx) || isNaN(dishIdx) || isNaN(itemIdx)) return;
-                    const item = appData.days[dayIdx].dishes[dishIdx].items[itemIdx];
+                    const dish = appData.days[dayIdx].dishes[dishIdx];
+                    if (!dish) return;
+                    const item = dish.items[itemIdx];
                     if (!item) return;
                     item.note = this.value.trim() || '';
                     saveAppData();
-                    scheduleRecordRaw(item);
+                    scheduleRecordRaw(dish.name, item);
                     scheduleRecordDishSnapshot(dayIdx, dishIdx);
                 };
             });
@@ -2603,8 +2159,8 @@
             if (appData && appData.days && appData.days.length > 0) addDraft('自动保存', appData);
         });
 
-        console.log('✅ 智能体已启动（往期菜品 + 往期原材料）');
-        console.log('📚 往期菜品：', Object.keys(pastDishes).length, '往期原材料：', Object.keys(pastRawMaterials).length);
+        console.log('✅ 智能体已启动（往期菜品 + 按菜品独立存储的往期原材料）');
+        console.log('📚 往期菜品：', Object.keys(pastDishes).length, '往期原材料记录：', Object.keys(pastRawMaterials).length);
     </script>
 </body>
 </html>
