@@ -119,15 +119,22 @@ body{font-family:-apple-system,'Segoe UI','PingFang SC',Roboto,'Helvetica Neue',
 .raw-material-item .raw-name{font-weight:600;color:#0f172a;font-size:clamp(13px,2.6vw,15px)}
 .raw-material-item .raw-meta{font-size:clamp(11px,2.2vw,13px);color:#64748b;margin-top:2px}
 .raw-material-item .raw-count{font-size:clamp(10px,2vw,12px);color:#94a3b8;background:#f1f5f9;padding:2px 8px;border-radius:20px;white-space:nowrap}
+
 /* 原材料库 */
 .lib-dish-card{border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;padding:12px 14px;background:#fff}
 .lib-dish-card .lib-dish-title{font-weight:700;font-size:clamp(14px,3vw,16px);color:#0f172a;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
 .lib-dish-card .lib-dish-title .lib-count{font-size:clamp(10px,2vw,12px);color:#8b5cf6;background:#ede9fe;padding:2px 10px;border-radius:20px;font-weight:600}
-.lib-data-buttons{display:flex;flex-wrap:wrap;gap:6px}
-.lib-data-btn{padding:6px 12px;border:1.5px solid #8b5cf6;background:#f5f3ff;color:#6d28d9;border-radius:8px;cursor:pointer;font-size:clamp(11px,2.4vw,13px);font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:4px;min-height:32px;touch-action:manipulation}
-.lib-data-btn:hover{background:#8b5cf6;color:#fff;transform:translateY(-1px)}
+.lib-data-buttons{display:flex;flex-wrap:wrap;gap:8px}
+.lib-data-item{display:inline-flex;align-items:stretch;border:1.5px solid #8b5cf6;border-radius:8px;overflow:hidden;transition:all .2s;background:#f5f3ff}
+.lib-data-item:hover{box-shadow:0 2px 8px rgba(139,92,246,.25)}
+.lib-data-btn{padding:6px 12px;border:none;background:transparent;color:#6d28d9;cursor:pointer;font-size:clamp(11px,2.4vw,13px);font-weight:600;transition:all .2s;display:inline-flex;align-items:center;gap:4px;touch-action:manipulation;min-height:32px}
+.lib-data-btn:hover{background:#8b5cf6;color:#fff}
 .lib-data-btn:active{transform:scale(.96)}
 .lib-data-btn .btn-meta{font-size:clamp(9px,1.9vw,11px);opacity:.85;font-weight:500}
+.lib-del-btn{padding:0 10px;border:none;border-left:1.5px solid #8b5cf6;background:transparent;color:#8b5cf6;cursor:pointer;font-size:clamp(12px,2.4vw,14px);font-weight:700;transition:all .2s;touch-action:manipulation;min-height:32px;display:inline-flex;align-items:center;justify-content:center}
+.lib-del-btn:hover{background:#dc2626;color:#fff;border-left-color:#dc2626}
+.lib-del-btn:active{transform:scale(.96)}
+
 .footer-actions{margin-top:20px;padding-top:16px;border-top:2px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
 .footer-actions .btn{padding:10px 20px;font-size:clamp(13px,3vw,15px);min-height:44px;flex:1 1 auto;max-width:100%}
 .empty-state{padding:30px 16px;text-align:center;color:#94a3b8;font-size:clamp(14px,3vw,16px);border:2px dashed #e2e8f0;border-radius:14px;margin-bottom:16px}
@@ -213,6 +220,7 @@ body{padding:4px}
 .toolbar .ratio-group .ratio-hint{font-size:clamp(9px,2vw,11px)}
 .empty-state{padding:20px 12px;font-size:clamp(13px,3vw,15px)}
 .dish-header .dish-actions .btn{font-size:clamp(9px,2vw,11px);padding:2px 8px;min-height:24px}
+.lib-data-btn,.lib-del-btn{font-size:clamp(10px,2.2vw,12px);padding:5px 8px}
 }
 @media(min-width:1200px){
 .app-container{padding:32px 36px 44px}
@@ -388,7 +396,7 @@ const SAMPLE_DATA={school:'尚湖初中',contact:'王亚俐',phone:'528939',unit
 // ============================================================
 // 存储 Key 与全局变量
 // ============================================================
-const STORAGE_KEY='foodOrderData_v28';
+const STORAGE_KEY='foodOrderData_v29';
 const DRAFTS_KEY='foodOrderDrafts_v1';
 const DISHES_KEY='foodOrderPastDishes_v5';
 const RAW_KEY='foodOrderPastRaw_v3';
@@ -400,11 +408,11 @@ let drafts=[];
 let autoSaveInterval=null;
 let pastDishes={};
 let pastRawMaterials={};
-let ingredientLibrary={}; // { 原材料名: [{total, note, dishName, addedAt}, ...] }
+let ingredientLibrary={};
 let currentPastDishTarget=null;
 let currentPastRawTarget=null;
 let currentPastRawDishName='';
-let currentLibTarget=null; // { dayIdx, dishIdx }
+let currentLibTarget=null;
 let historyCurrentTab='dish';
 
 // ============================================================
@@ -531,7 +539,7 @@ savePastDishes();
 }
 
 // ============================================================
-// 记录单个原材料（按菜品独立存储）
+// 记录单个原材料
 // ============================================================
 function recordRawMaterial(dishName,rawName,total,note){
 if(!dishName||!dishName.trim()||dishName==='未命名')return;
@@ -558,7 +566,7 @@ savePastRawMaterials();
 }
 
 // ============================================================
-// 原材料库：添加/检查
+// 原材料库
 // ============================================================
 function addToLibraryDirect(name,total,note,dishName){
 const key=name.trim();
@@ -577,27 +585,18 @@ saveIngredientLibrary();
 return true;
 }
 
-/**
- * 检查并可能询问用户是否将该原材料数据加入库
- * - 若库中无该原材料 → 静默添加
- * - 若库中已有且存在相同数据 → 静默跳过
- * - 若库中已有但数据不同 → 弹出确认框
- */
 function checkAndAddToLibrary(name,total,note,dishName){
 const key=name?name.trim():'';
 if(!key||key==='未命名')return;
 const t=parseFloat(total)||0;
 const n=note||'';
-// 库中无该原材料 → 静默添加
 if(!ingredientLibrary[key]){
 ingredientLibrary[key]=[{total:t,note:n,dishName:dishName||'',addedAt:Date.now()}];
 saveIngredientLibrary();
 return;
 }
-// 已有相同数据 → 跳过
 if(ingredientLibrary[key].some(e=>e.total===t&&e.note===n))return;
 
-// 有不同数据 → 询问用户是否入库
 const existingList=ingredientLibrary[key].map(e=>`合计${e.total}${e.note?'（'+e.note+'）':''}${e.dishName?' ['+e.dishName+']':''}`).join('、');
 const msg=`原材料“${key}”已存在不同的合计数据：\n已有：${existingList}\n当前：合计${t}${n?'（'+n+'）':''}${dishName?' ['+dishName+']':''}\n\n是否将当前数据也加入原材料库？`;
 showConfirmModal(msg,'原材料入库确认').then(ok=>{
@@ -605,17 +604,45 @@ if(ok){
 ingredientLibrary[key].push({total:t,note:n,dishName:dishName||'',addedAt:Date.now()});
 saveIngredientLibrary();
 showToast(`已将“${key}”（合计 ${t}）加入原材料库`,'success');
+// 若当前原材料库面板正打开，刷新内容
+const libOverlay=document.getElementById('ingredientLibModalOverlay');
+if(libOverlay&&libOverlay.classList.contains('active')){
+const searchInput=document.getElementById('ingredientLibSearchInput');
+renderIngredientLibContent(searchInput?searchInput.value.trim():'');
+}
 }
 });
 }
 
-// ============================================================
-// 从菜品中删除/清理：不作为强制
-// 当菜品重命名时，迁移往期原材料和库中 dishName 引用
-// ============================================================
+/**
+ * 删除原材料库中某个原材料的某个数据按钮
+ */
+function deleteIngredientLibItem(name,total,note,addedAt){
+if(!name)return;
+const list=ingredientLibrary[name];
+if(!list||!Array.isArray(list))return;
+// 优先按 addedAt 精确匹配，其次按 total + note 匹配
+let idx=-1;
+if(typeof addedAt==='number'){
+idx=list.findIndex(e=>e.addedAt===addedAt);
+}
+if(idx<0){
+idx=list.findIndex(e=>e.total===total&&(e.note||'')===(note||''));
+}
+if(idx<0)return;
+list.splice(idx,1);
+if(list.length===0){
+delete ingredientLibrary[name];
+}
+saveIngredientLibrary();
+showToast(`已删除“${name}”的一条数据`,'success');
+// 刷新面板
+const searchInput=document.getElementById('ingredientLibSearchInput');
+renderIngredientLibContent(searchInput?searchInput.value.trim():'');
+}
+
 function migrateRawMaterialsOnDishRename(oldName,newName){
 if(!oldName||!newName||oldName===newName)return;
-// 迁移往期原材料
 const keysToMigrate=Object.keys(pastRawMaterials).filter(k=>{
 const rec=pastRawMaterials[k];
 return rec&&rec.dishName===oldName;
@@ -627,7 +654,6 @@ pastRawMaterials[newKey]={...rec,dishName:newName,lastUsed:Date.now()};
 delete pastRawMaterials[oldKey];
 });
 if(keysToMigrate.length>0)savePastRawMaterials();
-// 迁移库中的 dishName 引用
 let libChanged=false;
 Object.keys(ingredientLibrary).forEach(name=>{
 (ingredientLibrary[name]||[]).forEach(e=>{
@@ -755,7 +781,6 @@ savePastRawMaterials();
 saveAppData();
 renderApp();
 scheduleRecordDishSnapshot(dayIdx,dishIdx);
-// 往期原材料加入时，检查是否需要入库
 checkAndAddToLibrary(raw.name,raw.lastTotal,raw.lastNote,dish.name);
 showToast(`已添加往期原材料：${raw.name}`,'success');
 }
@@ -772,7 +797,7 @@ currentLibTarget={dayIdx,dishIdx};
 const input=document.getElementById('ingredientLibSearchInput');
 if(input)input.value='';
 const hint=document.getElementById('ingredientLibDishHint');
-if(hint)hint.textContent=`当前菜品：${dish.name||'未命名菜品'} · 点击任意按钮即可添加`;
+if(hint)hint.textContent=`当前菜品：${dish.name||'未命名菜品'} · 点击任意按钮即可添加，点击✕可删除该数据`;
 renderIngredientLibContent('');
 document.getElementById('ingredientLibModalOverlay').classList.add('active');
 }
@@ -786,32 +811,50 @@ if(filtered.length===0){container.innerHTML='<div style="text-align:center;color
 let html='';
 filtered.forEach(name=>{
 const list=ingredientLibrary[name]||[];
-// 数据去重（同名+同合计+同备注 视为同一个按钮）
+// 唯一键（total + note + addedAt），保留不同 addedAt 的记录以支持精确删除
 const uniqueList=[];
 const seen=new Set();
 list.forEach(e=>{
-const key=`${e.total}||${e.note||''}`;
+const key=`${e.total}||${e.note||''}||${e.addedAt||0}`;
 if(!seen.has(key)){seen.add(key);uniqueList.push(e)}
 });
 // 按 total 升序
 uniqueList.sort((a,b)=>a.total-b.total);
 html+=`<div class="lib-dish-card"><div class="lib-dish-title"><span>${escapeHtml(name)}</span><span class="lib-count">${uniqueList.length} 种数据</span></div><div class="lib-data-buttons">`;
 uniqueList.forEach(e=>{
-const meta=[];
-meta.push(`合计 ${e.total}`);
-if(e.note)meta.push(`备注:${e.note}`);
-if(e.dishName)meta.push(`来自:${e.dishName}`);
-html+=`<button class="lib-data-btn" data-name="${escapeHtml(name)}" data-total="${e.total}" data-note="${escapeHtml(e.note||'')}">${e.total}<span class="btn-meta">${e.note?' · '+escapeHtml(e.note):''}</span></button>`;
+const noteAttr=escapeHtml(e.note||'');
+const addedAtAttr=typeof e.addedAt==='number'?e.addedAt:0;
+const metaLabel=e.note?` · ${escapeHtml(e.note)}`:'';
+html+=`<div class="lib-data-item">
+<button class="lib-data-btn" data-name="${escapeHtml(name)}" data-total="${e.total}" data-note="${noteAttr}" title="添加：合计 ${e.total}${e.note?' · '+escapeHtml(e.note):''}${e.dishName?' · 来自 '+escapeHtml(e.dishName):''}">${e.total}<span class="btn-meta">${metaLabel}</span></button>
+<button class="lib-del-btn" data-name="${escapeHtml(name)}" data-total="${e.total}" data-note="${noteAttr}" data-addedat="${addedAtAttr}" title="删除该数据">✕</button>
+</div>`;
 });
 html+=`</div></div>`;
 });
 container.innerHTML=html;
+// 添加按钮
 container.querySelectorAll('.lib-data-btn').forEach(btn=>{
 btn.onclick=function(){
 const name=this.dataset.name;
 const total=parseFloat(this.dataset.total)||0;
 const note=this.dataset.note||'';
 addFromLibrary(currentLibTarget.dayIdx,currentLibTarget.dishIdx,name,total,note);
+};
+});
+// 删除按钮
+container.querySelectorAll('.lib-del-btn').forEach(btn=>{
+btn.onclick=function(e){
+e.stopPropagation();
+const name=this.dataset.name;
+const total=parseFloat(this.dataset.total)||0;
+const note=this.dataset.note||'';
+const addedAt=parseInt(this.dataset.addedat)||0;
+showConfirmModal(`确定从原材料库中删除“${name}”（合计 ${total}${note?' · '+note:''}）这条数据吗？`,'删除确认').then(ok=>{
+if(ok){
+deleteIngredientLibItem(name,total,note,addedAt);
+}
+});
 };
 });
 }
@@ -1070,7 +1113,6 @@ const sRatio=appData.ratioStudent||7;
 const tRatio=appData.ratioTeacher||1;
 const hasPastDishes=Object.keys(pastDishes).length>0;
 const hasPastRaw=Object.keys(pastRawMaterials).length>0;
-const hasLibrary=Object.keys(ingredientLibrary).length>0;
 
 if(appData.days.length===0){
 const emptyDiv=document.createElement('div');
@@ -1144,8 +1186,7 @@ dishActions.className='dish-actions';
 let pastRawHtml='';
 if(hasPastRaw){pastRawHtml=`<button class="btn btn-info btn-sm add-past-raw-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}" style="background:#0ea5e9;">📋 往期原材料</button>`}
 
-let libHtml='';
-if(hasLibrary){libHtml=`<button class="btn btn-purple btn-sm add-ingredient-lib-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}">📚 原材料库</button>`}else{libHtml=`<button class="btn btn-purple btn-sm add-ingredient-lib-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}">📚 原材料库</button>`}
+let libHtml=`<button class="btn btn-purple btn-sm add-ingredient-lib-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}">📚 原材料库</button>`;
 
 dishActions.innerHTML=`${libHtml}${pastRawHtml}<button class="btn btn-outline add-item-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}">➕ 原材料</button><button class="btn-ghost-danger remove-dish-btn" data-dayidx="${dayIdx}" data-dishidx="${dishIdx}">✕ 删除菜品</button>`;
 
@@ -1224,7 +1265,6 @@ checkAndAddToLibrary(item.name,item.total,item.note,dishName);
 function bindAllEvents(){
 const container=document.getElementById('daysContainer');
 
-// 新增菜品
 container.querySelectorAll('.add-dish-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1237,22 +1277,18 @@ else if(name!==null&&name.trim()===''){showToast('菜品名称不能为空','err
 };
 });
 
-// 往期菜品
 container.querySelectorAll('.add-past-dish-btn').forEach(btn=>{
 btn.onclick=function(e){e.stopPropagation();const dayIdx=parseInt(this.dataset.dayidx);if(isNaN(dayIdx))return;openPastDishSelect(dayIdx)};
 });
 
-// 往期原材料
 container.querySelectorAll('.add-past-raw-btn').forEach(btn=>{
 btn.onclick=function(e){e.stopPropagation();const dayIdx=parseInt(this.dataset.dayidx);const dishIdx=parseInt(this.dataset.dishidx);if(isNaN(dayIdx)||isNaN(dishIdx))return;openPastRawSelect(dayIdx,dishIdx)};
 });
 
-// 原材料库
 container.querySelectorAll('.add-ingredient-lib-btn').forEach(btn=>{
 btn.onclick=function(e){e.stopPropagation();const dayIdx=parseInt(this.dataset.dayidx);const dishIdx=parseInt(this.dataset.dishidx);if(isNaN(dayIdx)||isNaN(dishIdx))return;openIngredientLib(dayIdx,dishIdx)};
 });
 
-// 删除菜品
 container.querySelectorAll('.remove-dish-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1269,7 +1305,6 @@ showToast('已删除菜品','success');
 };
 });
 
-// 添加原材料
 container.querySelectorAll('.add-item-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1312,7 +1347,6 @@ showToast(`已添加原材料：${name.trim()}`,'success');
 };
 });
 
-// 合计输入
 container.querySelectorAll('.item-total').forEach(inp=>{
 inp.oninput=function(){
 const tr=this.closest('tr');
@@ -1339,7 +1373,6 @@ scheduleRecordDishSnapshot(dayIdx,dishIdx);
 };
 });
 
-// 原材料名称变更
 container.querySelectorAll('.item-name').forEach(inp=>{
 inp.onchange=function(){
 const tr=this.closest('tr');
@@ -1359,7 +1392,6 @@ scheduleRecordDishSnapshot(dayIdx,dishIdx);
 };
 });
 
-// 备注变更
 container.querySelectorAll('.item-note').forEach(inp=>{
 inp.onchange=function(){
 const tr=this.closest('tr');
@@ -1379,7 +1411,6 @@ scheduleRecordDishSnapshot(dayIdx,dishIdx);
 };
 });
 
-// 删除原材料
 container.querySelectorAll('.remove-item-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1396,7 +1427,6 @@ showToast('已删除原材料','success');
 };
 });
 
-// 删除天
 container.querySelectorAll('.remove-day-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1643,7 +1673,7 @@ saveAppData();
 if(appData&&appData.days&&appData.days.length>0)addDraft('自动保存',appData);
 });
 
-console.log('✅ 智能体已启动（新增原材料库）');
+console.log('✅ 智能体已启动（原材料库支持删除数据）');
 console.log('📚 往期菜品：',Object.keys(pastDishes).length,'往期原材料：',Object.keys(pastRawMaterials).length,'原材料库：',Object.keys(ingredientLibrary).length);
 </script>
 </body>
