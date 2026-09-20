@@ -272,7 +272,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 隐藏的文件输入 -->
 <input type="file" id="importDataFile" accept=".json,application/json" style="display:none">
 
 <div class="sample-section" id="sampleSection">
@@ -312,7 +311,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 通用模态框 -->
 <div class="modal-overlay" id="modalOverlay">
 <div class="modal-box">
 <h3 id="modalTitle">输入</h3>
@@ -324,7 +322,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 往期菜品 -->
 <div class="modal-overlay" id="pastDishModalOverlay">
 <div class="modal-box" style="max-width:600px;">
 <h3>📋 选择往期菜品</h3>
@@ -334,7 +331,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 往期原材料 -->
 <div class="modal-overlay" id="pastRawModalOverlay">
 <div class="modal-box" style="max-width:600px;">
 <h3>📋 选择往期原材料</h3>
@@ -345,7 +341,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 原材料库 -->
 <div class="modal-overlay" id="ingredientLibModalOverlay">
 <div class="modal-box" style="max-width:700px;">
 <h3>📚 原材料库</h3>
@@ -356,7 +351,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 往期数据 -->
 <div class="modal-overlay" id="pastHistoryModalOverlay">
 <div class="modal-box" style="max-width:780px;">
 <h3>📚 往期数据</h3>
@@ -375,7 +369,6 @@ body{padding:4px}
 </div>
 </div>
 
-<!-- 通用确认 -->
 <div class="modal-overlay" id="confirmModalOverlay">
 <div class="modal-box" style="max-width:480px;">
 <h3 id="confirmModalTitle">确认</h3>
@@ -410,14 +403,7 @@ const DISHES_KEY='foodOrderPastDishes_v5';
 const RAW_KEY='foodOrderPastRaw_v3';
 const LIBRARY_KEY='foodOrderIngredientLib_v1';
 
-// 需要同步的所有 localStorage 键
-const SYNC_KEYS=[
-STORAGE_KEY,
-DRAFTS_KEY,
-DISHES_KEY,
-RAW_KEY,
-LIBRARY_KEY
-];
+const SYNC_KEYS=[STORAGE_KEY,DRAFTS_KEY,DISHES_KEY,RAW_KEY,LIBRARY_KEY];
 
 let appData=null;
 let saveTimeout=null;
@@ -479,7 +465,7 @@ return result;
 }
 
 // ============================================================
-// 往期菜品、往期原材料、原材料库 加载
+// 往期数据加载
 // ============================================================
 function loadPastDishes(){
 const stored=localStorage.getItem(DISHES_KEY);
@@ -532,12 +518,7 @@ function saveIngredientLibrary(){try{localStorage.setItem(LIBRARY_KEY,JSON.strin
 // 导出/导入数据
 // ============================================================
 function exportAllData(){
-const pack={
-_version:1,
-_exportedAt:new Date().toISOString(),
-appName:'尚湖初中食品订单管理',
-data:{}
-};
+const pack={_version:1,_exportedAt:new Date().toISOString(),appName:'尚湖初中食品订单管理',data:{}};
 SYNC_KEYS.forEach(key=>{
 const val=localStorage.getItem(key);
 if(val!==null){pack.data[key]=val}
@@ -566,48 +547,42 @@ reader.onload=e=>{
 try{
 const pack=JSON.parse(e.target.result);
 let data=null;
-if(pack&&pack.data&&typeof pack.data==='object'){
-data=pack.data;
-}else if(pack&&typeof pack==='object'&&!Array.isArray(pack)){
-// 兼容直接导出为键值对的情况
-data=pack;
-}else{
-throw new Error('文件格式不正确');
-}
+if(pack&&pack.data&&typeof pack.data==='object'){data=pack.data}
+else if(pack&&typeof pack==='object'&&!Array.isArray(pack)){data=pack}
+else{throw new Error('文件格式不正确')}
 const keysFound=Object.keys(data).filter(k=>SYNC_KEYS.includes(k));
-if(keysFound.length===0){
-showToast('该文件中没有找到可导入的智能体数据','error');
-return;
-}
+if(keysFound.length===0){showToast('该文件中没有找到可导入的智能体数据','error');return}
 showConfirmModal(
 `确定要从该文件导入数据吗？\n将覆盖当前设备上的以下 ${keysFound.length} 项数据：\n${keysFound.join('\n')}\n\n此操作不可撤销。`,
 '导入数据确认'
 ).then(ok=>{
 if(!ok)return;
-keysFound.forEach(key=>{
-localStorage.setItem(key,data[key]);
-});
+keysFound.forEach(key=>{localStorage.setItem(key,data[key])});
 showToast('✅ 导入成功，正在刷新页面...','success');
 setTimeout(()=>location.reload(),700);
 });
-}catch(err){
-console.error(err);
-showToast('导入失败：'+err.message,'error');
-}
+}catch(err){console.error(err);showToast('导入失败：'+err.message,'error')}
 };
 reader.onerror=()=>{showToast('读取文件失败','error')};
 reader.readAsText(file);
 }
 
 // ============================================================
-// 记录菜品快照
+// 记录菜品快照（★ 修复：合计为0的项不记录）
 // ============================================================
 function recordDishSnapshot(dayIdx,dishIdx){
 const day=appData.days[dayIdx];
 if(!day)return;
 const dish=day.dishes[dishIdx];
 if(!dish||!dish.name||dish.name==='未命名')return;
-const items=(dish.items||[]).filter(i=>i.name&&i.name.trim()&&i.name!=='未命名').map(i=>({name:i.name.trim(),total:parseFloat(i.total)||0,note:i.note||''}));
+// ★ 只收集合计大于0的原材料
+const items=(dish.items||[])
+.filter(i=>i.name&&i.name.trim()&&i.name!=='未命名')
+.filter(i=>{
+const t=parseFloat(i.total);
+return !isNaN(t)&&t>0;
+})
+.map(i=>({name:i.name.trim(),total:parseFloat(i.total)||0,note:i.note||''}));
 if(items.length===0)return;
 const key=dish.name.trim();
 const snapshot={timestamp:Date.now(),items:JSON.parse(JSON.stringify(items))};
@@ -627,7 +602,7 @@ savePastDishes();
 }
 
 // ============================================================
-// 记录单个原材料
+// 记录单个原材料（★ 修复：合计为0不记录）
 // ============================================================
 function recordRawMaterial(dishName,rawName,total,note){
 if(!dishName||!dishName.trim()||dishName==='未命名')return;
@@ -635,9 +610,11 @@ if(!rawName||!rawName.trim())return;
 const rawTrim=rawName.trim();
 const dishTrim=dishName.trim();
 if(rawTrim==='未命名')return;
-const key=`${dishTrim}::${rawTrim}`;
-const t=parseFloat(total)||0;
+// ★ 合计为0或无效时跳过
+const t=parseFloat(total);
+if(isNaN(t)||t<=0)return;
 const n=note||'';
+const key=`${dishTrim}::${rawTrim}`;
 if(!pastRawMaterials[key]){
 pastRawMaterials[key]={name:rawTrim,dishName:dishTrim,lastTotal:t,lastNote:n,lastUsed:Date.now(),history:[{timestamp:Date.now(),total:t,note:n}]};
 }else{
@@ -654,29 +631,14 @@ savePastRawMaterials();
 }
 
 // ============================================================
-// 原材料库
+// 原材料库检查（★ 修复：合计为0不入库）
 // ============================================================
-function addToLibraryDirect(name,total,note,dishName){
-const key=name.trim();
-if(!key||key==='未命名')return false;
-const t=parseFloat(total)||0;
-const n=note||'';
-if(!ingredientLibrary[key]){
-ingredientLibrary[key]=[{total:t,note:n,dishName:dishName||'',addedAt:Date.now()}];
-saveIngredientLibrary();
-return true;
-}
-const dup=ingredientLibrary[key].some(e=>e.total===t&&e.note===n);
-if(dup)return false;
-ingredientLibrary[key].push({total:t,note:n,dishName:dishName||'',addedAt:Date.now()});
-saveIngredientLibrary();
-return true;
-}
-
 function checkAndAddToLibrary(name,total,note,dishName){
 const key=name?name.trim():'';
 if(!key||key==='未命名')return;
-const t=parseFloat(total)||0;
+const t=parseFloat(total);
+// ★ 合计为0或无效时不入库
+if(isNaN(t)||t<=0)return;
 const n=note||'';
 if(!ingredientLibrary[key]){
 ingredientLibrary[key]=[{total:t,note:n,dishName:dishName||'',addedAt:Date.now()}];
@@ -684,7 +646,6 @@ saveIngredientLibrary();
 return;
 }
 if(ingredientLibrary[key].some(e=>e.total===t&&e.note===n))return;
-
 const existingList=ingredientLibrary[key].map(e=>`合计${e.total}${e.note?'（'+e.note+'）':''}${e.dishName?' ['+e.dishName+']':''}`).join('、');
 const msg=`原材料“${key}”已存在不同的合计数据：\n已有：${existingList}\n当前：合计${t}${n?'（'+n+'）':''}${dishName?' ['+dishName+']':''}\n\n是否将当前数据也加入原材料库？`;
 showConfirmModal(msg,'原材料入库确认').then(ok=>{
@@ -706,17 +667,11 @@ if(!name)return;
 const list=ingredientLibrary[name];
 if(!list||!Array.isArray(list))return;
 let idx=-1;
-if(typeof addedAt==='number'){
-idx=list.findIndex(e=>e.addedAt===addedAt);
-}
-if(idx<0){
-idx=list.findIndex(e=>e.total===total&&(e.note||'')===(note||''));
-}
+if(typeof addedAt==='number'){idx=list.findIndex(e=>e.addedAt===addedAt)}
+if(idx<0){idx=list.findIndex(e=>e.total===total&&(e.note||'')===(note||''))}
 if(idx<0)return;
 list.splice(idx,1);
-if(list.length===0){
-delete ingredientLibrary[name];
-}
+if(list.length===0){delete ingredientLibrary[name]}
 saveIngredientLibrary();
 showToast(`已删除“${name}”的一条数据`,'success');
 const searchInput=document.getElementById('ingredientLibSearchInput');
@@ -868,7 +823,7 @@ showToast(`已添加往期原材料：${raw.name}`,'success');
 }
 
 // ============================================================
-// 原材料库：打开与渲染
+// 原材料库
 // ============================================================
 function openIngredientLib(dayIdx,dishIdx){
 const day=appData.days[dayIdx];
@@ -929,9 +884,7 @@ const total=parseFloat(this.dataset.total)||0;
 const note=this.dataset.note||'';
 const addedAt=parseInt(this.dataset.addedat)||0;
 showConfirmModal(`确定从原材料库中删除“${name}”（合计 ${total}${note?' · '+note:''}）这条数据吗？`,'删除确认').then(ok=>{
-if(ok){
-deleteIngredientLibItem(name,total,note,addedAt);
-}
+if(ok){deleteIngredientLibItem(name,total,note,addedAt)}
 });
 };
 });
@@ -1315,7 +1268,7 @@ bindGlobalEvents();
 }
 
 // ============================================================
-// 记录快照与原材料入库（防抖）
+// 记录快照（防抖）
 // ============================================================
 function scheduleRecordDishSnapshot(dayIdx,dishIdx){
 const day=appData.days[dayIdx];
@@ -1331,6 +1284,7 @@ if(!item||!dishName)return;
 clearTimeout(item._rawTimer);
 item._rawTimer=setTimeout(()=>{
 if(item.name&&item.name!=='未命名'){
+// ★ 合计为0时 recordRawMaterial 内部会自动跳过
 recordRawMaterial(dishName,item.name,item.total,item.note);
 checkAndAddToLibrary(item.name,item.total,item.note,dishName);
 }
@@ -1553,11 +1507,9 @@ const exportFn=function(){exportXlsxData(appData)};
 document.getElementById('exportBtn').onclick=exportFn;
 document.getElementById('exportBtn2').onclick=exportFn;
 
-// 导出数据
 document.getElementById('exportDataBtn').onclick=exportAllData;
 document.getElementById('exportDataBtn2').onclick=exportAllData;
 
-// 导入数据
 const fileInput=document.getElementById('importDataFile');
 const triggerImport=function(){fileInput.value='';fileInput.click()};
 document.getElementById('importDataBtn').onclick=triggerImport;
@@ -1581,7 +1533,6 @@ if(appData&&appData.days&&appData.days.length>0)addDraft('自动保存',appData)
 },30000);
 }
 
-// 模态框关闭
 document.getElementById('pastDishCancel').onclick=function(){document.getElementById('pastDishModalOverlay').classList.remove('active')};
 document.getElementById('pastDishModalOverlay').onclick=function(e){if(e.target===this)this.classList.remove('active')};
 document.getElementById('pastDishSearchInput').oninput=function(){renderPastDishSelectList(this.value.trim())};
@@ -1612,7 +1563,7 @@ renderPastHistoryContent('','');
 });
 
 // ============================================================
-// 导出 .xlsx
+// 导出 .xlsx（★ 修复：合计为0不导出）
 // ============================================================
 function exportXlsxData(data,customFileName){
 if(!data)return;
@@ -1661,9 +1612,15 @@ dayNames.forEach(()=>headerRow2.push('','学生','老师','合计',''));
 while(headerRow2.length<colCount)headerRow2.push('');
 rows.push(headerRow2);
 
+// ★ 只导出合计大于0的原材料
 const dayFlattenItems=days.map(day=>{
 const out=[];
-(day.dishes||[]).forEach(dish=>{(dish.items||[]).forEach(item=>out.push(item))});
+(day.dishes||[]).forEach(dish=>{
+(dish.items||[]).forEach(item=>{
+const t=parseFloat(item.total);
+if(!isNaN(t)&&t>0){out.push(item)}
+});
+});
 return out;
 });
 let maxItems=0;
@@ -1762,7 +1719,7 @@ saveAppData();
 if(appData&&appData.days&&appData.days.length>0)addDraft('自动保存',appData);
 });
 
-console.log('✅ 智能体已启动（支持导出数据/导入数据）');
+console.log('✅ 智能体已启动');
 console.log('📚 往期菜品：',Object.keys(pastDishes).length,'往期原材料：',Object.keys(pastRawMaterials).length,'原材料库：',Object.keys(ingredientLibrary).length);
 </script>
 </body>
