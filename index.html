@@ -35,6 +35,10 @@ body{font-family:-apple-system,'Segoe UI','PingFang SC',Roboto,'Helvetica Neue',
 .btn-info{background:#0ea5e9;color:#fff}
 .btn-purple{background:#8b5cf6;color:#fff}
 .btn-purple:active{background:#7c3aed}
+.btn-warning{background:#f59e0b;color:#fff}
+.btn-warning:active{background:#d97706}
+.btn-teal{background:#14b8a6;color:#fff}
+.btn-teal:active{background:#0d9488}
 .btn-sm{padding:4px 10px;font-size:clamp(11px,2.2vw,13px);min-height:30px}
 .sample-section{background:#f8fafc;border:1px solid #e2e8f0;border-radius:14px;padding:12px 14px;margin-bottom:20px}
 .sample-section .sample-title{font-size:clamp(14px,3vw,16px);font-weight:600;color:#475569;margin-bottom:8px;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
@@ -119,8 +123,6 @@ body{font-family:-apple-system,'Segoe UI','PingFang SC',Roboto,'Helvetica Neue',
 .raw-material-item .raw-name{font-weight:600;color:#0f172a;font-size:clamp(13px,2.6vw,15px)}
 .raw-material-item .raw-meta{font-size:clamp(11px,2.2vw,13px);color:#64748b;margin-top:2px}
 .raw-material-item .raw-count{font-size:clamp(10px,2vw,12px);color:#94a3b8;background:#f1f5f9;padding:2px 8px;border-radius:20px;white-space:nowrap}
-
-/* 原材料库 */
 .lib-dish-card{border:1px solid #e2e8f0;border-radius:10px;margin-bottom:10px;padding:12px 14px;background:#fff}
 .lib-dish-card .lib-dish-title{font-weight:700;font-size:clamp(14px,3vw,16px);color:#0f172a;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px}
 .lib-dish-card .lib-dish-title .lib-count{font-size:clamp(10px,2vw,12px);color:#8b5cf6;background:#ede9fe;padding:2px 10px;border-radius:20px;font-weight:600}
@@ -134,7 +136,6 @@ body{font-family:-apple-system,'Segoe UI','PingFang SC',Roboto,'Helvetica Neue',
 .lib-del-btn{padding:0 10px;border:none;border-left:1.5px solid #8b5cf6;background:transparent;color:#8b5cf6;cursor:pointer;font-size:clamp(12px,2.4vw,14px);font-weight:700;transition:all .2s;touch-action:manipulation;min-height:32px;display:inline-flex;align-items:center;justify-content:center}
 .lib-del-btn:hover{background:#dc2626;color:#fff;border-left-color:#dc2626}
 .lib-del-btn:active{transform:scale(.96)}
-
 .footer-actions{margin-top:20px;padding-top:16px;border-top:2px solid #e2e8f0;display:flex;flex-wrap:wrap;gap:10px;justify-content:flex-end}
 .footer-actions .btn{padding:10px 20px;font-size:clamp(13px,3vw,15px);min-height:44px;flex:1 1 auto;max-width:100%}
 .empty-state{padding:30px 16px;text-align:center;color:#94a3b8;font-size:clamp(14px,3vw,16px);border:2px dashed #e2e8f0;border-radius:14px;margin-bottom:16px}
@@ -264,10 +265,15 @@ body{padding:4px}
 </div>
 <div class="btn-group">
 <button class="btn btn-info" id="viewPastBtn">📚 往期数据</button>
+<button class="btn btn-teal" id="exportDataBtn">📤 导出数据</button>
+<button class="btn btn-warning" id="importDataBtn">📥 导入数据</button>
 <button class="btn btn-success" id="exportBtn">📥 导出 .xlsx</button>
 <button class="btn btn-danger" id="clearBtn">🗑️ 清空数据</button>
 </div>
 </div>
+
+<!-- 隐藏的文件输入 -->
+<input type="file" id="importDataFile" accept=".json,application/json" style="display:none">
 
 <div class="sample-section" id="sampleSection">
 <div class="sample-title">
@@ -299,6 +305,8 @@ body{padding:4px}
 
 <div class="footer-actions">
 <button class="btn btn-primary" id="addDayBtn">➕ 添加新的一天</button>
+<button class="btn btn-teal" id="exportDataBtn2">📤 导出数据</button>
+<button class="btn btn-warning" id="importDataBtn2">📥 导入数据</button>
 <button class="btn btn-success" id="exportBtn2">📥 导出 .xlsx</button>
 <button class="btn btn-danger" id="clearBtn2">🗑️ 清空数据</button>
 </div>
@@ -401,6 +409,15 @@ const DRAFTS_KEY='foodOrderDrafts_v1';
 const DISHES_KEY='foodOrderPastDishes_v5';
 const RAW_KEY='foodOrderPastRaw_v3';
 const LIBRARY_KEY='foodOrderIngredientLib_v1';
+
+// 需要同步的所有 localStorage 键
+const SYNC_KEYS=[
+STORAGE_KEY,
+DRAFTS_KEY,
+DISHES_KEY,
+RAW_KEY,
+LIBRARY_KEY
+];
 
 let appData=null;
 let saveTimeout=null;
@@ -512,6 +529,77 @@ function savePastRawMaterials(){try{localStorage.setItem(RAW_KEY,JSON.stringify(
 function saveIngredientLibrary(){try{localStorage.setItem(LIBRARY_KEY,JSON.stringify(ingredientLibrary))}catch(e){console.warn('保存原材料库失败',e)}}
 
 // ============================================================
+// 导出/导入数据
+// ============================================================
+function exportAllData(){
+const pack={
+_version:1,
+_exportedAt:new Date().toISOString(),
+appName:'尚湖初中食品订单管理',
+data:{}
+};
+SYNC_KEYS.forEach(key=>{
+const val=localStorage.getItem(key);
+if(val!==null){pack.data[key]=val}
+});
+const blob=new Blob([JSON.stringify(pack,null,2)],{type:'application/json'});
+const url=URL.createObjectURL(blob);
+const a=document.createElement('a');
+const stamp=new Date().toISOString().slice(0,10);
+a.href=url;
+a.download=`食品订单数据备份_${stamp}.json`;
+document.body.appendChild(a);
+a.click();
+document.body.removeChild(a);
+setTimeout(()=>URL.revokeObjectURL(url),1500);
+showToast('✅ 数据已导出，请将 .json 文件传输到其他设备导入','success');
+}
+
+function importAllData(file){
+if(!file)return;
+if(!/\.json$/i.test(file.name)&&file.type!=='application/json'){
+showToast('请选择 .json 文件','error');
+return;
+}
+const reader=new FileReader();
+reader.onload=e=>{
+try{
+const pack=JSON.parse(e.target.result);
+let data=null;
+if(pack&&pack.data&&typeof pack.data==='object'){
+data=pack.data;
+}else if(pack&&typeof pack==='object'&&!Array.isArray(pack)){
+// 兼容直接导出为键值对的情况
+data=pack;
+}else{
+throw new Error('文件格式不正确');
+}
+const keysFound=Object.keys(data).filter(k=>SYNC_KEYS.includes(k));
+if(keysFound.length===0){
+showToast('该文件中没有找到可导入的智能体数据','error');
+return;
+}
+showConfirmModal(
+`确定要从该文件导入数据吗？\n将覆盖当前设备上的以下 ${keysFound.length} 项数据：\n${keysFound.join('\n')}\n\n此操作不可撤销。`,
+'导入数据确认'
+).then(ok=>{
+if(!ok)return;
+keysFound.forEach(key=>{
+localStorage.setItem(key,data[key]);
+});
+showToast('✅ 导入成功，正在刷新页面...','success');
+setTimeout(()=>location.reload(),700);
+});
+}catch(err){
+console.error(err);
+showToast('导入失败：'+err.message,'error');
+}
+};
+reader.onerror=()=>{showToast('读取文件失败','error')};
+reader.readAsText(file);
+}
+
+// ============================================================
 // 记录菜品快照
 // ============================================================
 function recordDishSnapshot(dayIdx,dishIdx){
@@ -604,7 +692,6 @@ if(ok){
 ingredientLibrary[key].push({total:t,note:n,dishName:dishName||'',addedAt:Date.now()});
 saveIngredientLibrary();
 showToast(`已将“${key}”（合计 ${t}）加入原材料库`,'success');
-// 若当前原材料库面板正打开，刷新内容
 const libOverlay=document.getElementById('ingredientLibModalOverlay');
 if(libOverlay&&libOverlay.classList.contains('active')){
 const searchInput=document.getElementById('ingredientLibSearchInput');
@@ -614,14 +701,10 @@ renderIngredientLibContent(searchInput?searchInput.value.trim():'');
 });
 }
 
-/**
- * 删除原材料库中某个原材料的某个数据按钮
- */
 function deleteIngredientLibItem(name,total,note,addedAt){
 if(!name)return;
 const list=ingredientLibrary[name];
 if(!list||!Array.isArray(list))return;
-// 优先按 addedAt 精确匹配，其次按 total + note 匹配
 let idx=-1;
 if(typeof addedAt==='number'){
 idx=list.findIndex(e=>e.addedAt===addedAt);
@@ -636,7 +719,6 @@ delete ingredientLibrary[name];
 }
 saveIngredientLibrary();
 showToast(`已删除“${name}”的一条数据`,'success');
-// 刷新面板
 const searchInput=document.getElementById('ingredientLibSearchInput');
 renderIngredientLibContent(searchInput?searchInput.value.trim():'');
 }
@@ -811,14 +893,12 @@ if(filtered.length===0){container.innerHTML='<div style="text-align:center;color
 let html='';
 filtered.forEach(name=>{
 const list=ingredientLibrary[name]||[];
-// 唯一键（total + note + addedAt），保留不同 addedAt 的记录以支持精确删除
 const uniqueList=[];
 const seen=new Set();
 list.forEach(e=>{
 const key=`${e.total}||${e.note||''}||${e.addedAt||0}`;
 if(!seen.has(key)){seen.add(key);uniqueList.push(e)}
 });
-// 按 total 升序
 uniqueList.sort((a,b)=>a.total-b.total);
 html+=`<div class="lib-dish-card"><div class="lib-dish-title"><span>${escapeHtml(name)}</span><span class="lib-count">${uniqueList.length} 种数据</span></div><div class="lib-data-buttons">`;
 uniqueList.forEach(e=>{
@@ -833,7 +913,6 @@ html+=`<div class="lib-data-item">
 html+=`</div></div>`;
 });
 container.innerHTML=html;
-// 添加按钮
 container.querySelectorAll('.lib-data-btn').forEach(btn=>{
 btn.onclick=function(){
 const name=this.dataset.name;
@@ -842,7 +921,6 @@ const note=this.dataset.note||'';
 addFromLibrary(currentLibTarget.dayIdx,currentLibTarget.dishIdx,name,total,note);
 };
 });
-// 删除按钮
 container.querySelectorAll('.lib-del-btn').forEach(btn=>{
 btn.onclick=function(e){
 e.stopPropagation();
@@ -1475,6 +1553,17 @@ const exportFn=function(){exportXlsxData(appData)};
 document.getElementById('exportBtn').onclick=exportFn;
 document.getElementById('exportBtn2').onclick=exportFn;
 
+// 导出数据
+document.getElementById('exportDataBtn').onclick=exportAllData;
+document.getElementById('exportDataBtn2').onclick=exportAllData;
+
+// 导入数据
+const fileInput=document.getElementById('importDataFile');
+const triggerImport=function(){fileInput.value='';fileInput.click()};
+document.getElementById('importDataBtn').onclick=triggerImport;
+document.getElementById('importDataBtn2').onclick=triggerImport;
+fileInput.onchange=function(){if(this.files&&this.files[0])importAllData(this.files[0])};
+
 document.getElementById('saveDraftBtn').onclick=function(){
 const nameInput=document.getElementById('draftNameInput');
 let name=nameInput.value.trim();
@@ -1673,7 +1762,7 @@ saveAppData();
 if(appData&&appData.days&&appData.days.length>0)addDraft('自动保存',appData);
 });
 
-console.log('✅ 智能体已启动（原材料库支持删除数据）');
+console.log('✅ 智能体已启动（支持导出数据/导入数据）');
 console.log('📚 往期菜品：',Object.keys(pastDishes).length,'往期原材料：',Object.keys(pastRawMaterials).length,'原材料库：',Object.keys(ingredientLibrary).length);
 </script>
 </body>
